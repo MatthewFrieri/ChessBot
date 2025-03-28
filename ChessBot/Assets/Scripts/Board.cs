@@ -6,12 +6,14 @@ namespace Chess
     public static class Board
     {
         static readonly int[] squares;
-        static bool whiteToPlay;
+        static int colorToPlay;
+        static List<Move> playedMoves;
 
         static Board()
         {
             squares = new int[64];
-            whiteToPlay = true;
+            colorToPlay = Piece.White;
+            playedMoves = new List<Move>();
         }
 
         public static int[] Squares
@@ -30,6 +32,19 @@ namespace Chess
         public static int Rank(int square)
         {
             return square / 8;
+        }
+
+        public static void ExecuteMove(Move move)
+        {
+            playedMoves.Add(move)
+        }
+
+        public static int[] PretendExecuteMove(Move move)
+        {
+            int[] squaresCopy = (int[])squares.Clone();
+            squaresCopy[move.TargetSquare] = squaresCopy[move.StartSquare];
+            squaresCopy[move.StartSquare] = Piece.None;
+            return squaresCopy;
         }
 
         public static void LoadFromFEN(string fen)
@@ -73,10 +88,5 @@ namespace Chess
             }
         }
 
-
-
-
-
     }
 }
-
