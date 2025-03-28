@@ -5,31 +5,50 @@ namespace Chess
 {
     public static class Board
     {
-        static readonly int[] Squares;
+        static readonly int[] squares;
+        static bool whiteToPlay;
 
         static Board()
         {
-            Squares = new int[64];
+            squares = new int[64];
+            whiteToPlay = true;
         }
 
+        public static int[] Squares
+        {
+            get
+            {
+                return squares;
+            }
+        }
+
+        public static int File(int square)
+        {
+            return square % 8;
+        }
+
+        public static int Rank(int square)
+        {
+            return square / 8;
+        }
 
         public static void LoadFromFEN(string fen)
         {
 
-            Dictionary<char, int> symbolToPiece = new Dictionary<char, int>();
-            symbolToPiece['p'] = Piece.Pawn;
-            symbolToPiece['r'] = Piece.Rook;
-            symbolToPiece['n'] = Piece.Knight;
-            symbolToPiece['b'] = Piece.Bishop;
-            symbolToPiece['q'] = Piece.Queen;
-            symbolToPiece['k'] = Piece.King;
+            Dictionary<char, int> symbolToPiece = new Dictionary<char, int>{
+                {'p', Piece.Pawn},
+                {'r', Piece.Rook},
+                {'n', Piece.Knight},
+                {'b', Piece.Bishop},
+                {'q', Piece.Queen},
+                {'k', Piece.King}
+            };
 
             int rank = 7;
             int file = 0;
 
             foreach (char symbol in fen.Split(' ')[0])
             {
-
                 if (symbol == '/')
                 {
                     rank -= 1;
@@ -48,16 +67,15 @@ namespace Chess
                 int pieceColor = char.IsUpper(symbol) ? Piece.White : Piece.Black;
                 int piece = pieceType | pieceColor;
 
-                Squares[rank * 8 + file] = piece;
+                squares[rank * 8 + file] = piece;
 
                 file += 1;
             }
         }
 
-        public static int[] GetSquares()
-        {
-            return Squares;
-        }
+
+
+
 
     }
 }

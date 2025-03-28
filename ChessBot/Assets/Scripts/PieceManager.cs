@@ -42,15 +42,15 @@ public class PieceManager : MonoBehaviour
     void InstantiatePieces()
     {
 
-        Board.LoadFromFEN("2kr2nr/Qpq3bp/1B2p1p1/3pP3/2p5/2P2N2/PP3PPP/R3R1K1 b - - 0 17");
+        Board.LoadFromFEN("r1bqkb1r/p6p/RR4RR/8/8/r7/1P5P/2BQKB2 w - - 0 1");
 
-        int[] squares = Board.GetSquares();
-        for (int i = 0; i < 64; i += 1)
+        int[] squares = Board.Squares;
+        for (int square = 0; square < 64; square += 1)
         {
-            int piece = squares[i];
-            if (piece == 0) continue;
+            int piece = squares[square];
+            if (piece == Piece.None) continue;
 
-            Vector2 location = new Vector2(i % 8, i / 8);
+            Vector2 location = new Vector2(Board.File(square), Board.Rank(square));
             Vector2 centeringOffset = new Vector2(0.5f, 0.5f);
 
             Instantiate(pieceToGameObject[piece], location + centeringOffset, Quaternion.identity);
