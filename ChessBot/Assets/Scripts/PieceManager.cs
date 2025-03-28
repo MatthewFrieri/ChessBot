@@ -38,11 +38,25 @@ public class PieceManager : MonoBehaviour
         InstantiatePieces();
     }
 
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        foreach (Move move in Board.tempLegalMoves)
+        {
+            if (Piece.Type(Board.Squares[move.StartSquare]) == Piece.Pawn)
+            {
+                Vector2 location = new Vector2(Board.File(move.TargetSquare) + 0.5f, Board.Rank(move.TargetSquare) + 0.5f);
+                Gizmos.DrawSphere(location, 0.3f);
+
+            }
+        }
+    }
+
 
     void InstantiatePieces()
     {
 
-        Board.LoadFromFEN("r1bqkb1r/p6p/RR4RR/8/8/r7/1P5P/2BQKB2 w - - 0 1");
+        Board.LoadFromFEN("8/8/8/r2Pp2K/8/8/8/8 w - - 0 1");
 
         int[] squares = Board.Squares;
         for (int square = 0; square < 64; square += 1)
@@ -56,5 +70,12 @@ public class PieceManager : MonoBehaviour
             Instantiate(pieceToGameObject[piece], location + centeringOffset, Quaternion.identity);
         }
     }
+
+
+    public void ShowLegalMoves(List<Move> moves)
+    {
+
+    }
+
 
 }

@@ -328,18 +328,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee1dd76ac66780f41b132850164558f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pawnWhite: {fileID: 3253237662055291400, guid: b78e948a94bc3684c99e75be1075ca18, type: 3}
-  rookWhite: {fileID: 4425632818038759117, guid: 5ab769575f8adef45a39573c0b06a2f1, type: 3}
-  knightWhite: {fileID: 650347800650398565, guid: 1248d7c76db95164d88205c8a00ae15f, type: 3}
-  bishopWhite: {fileID: 1738927015009145002, guid: ace250d611ac08545b496ceee58c301f, type: 3}
-  queenWhite: {fileID: 4490965593838536220, guid: b95d9db1d8402fe4c92eebac9cdbe3da, type: 3}
-  kingWhite: {fileID: 5935226302257671184, guid: 2ca48a87a53b21745a431b6bf3ca0739, type: 3}
-  pawnBlack: {fileID: 2468013955599269506, guid: a90216eb40096424ba69d5a1a4717dff, type: 3}
-  rookBlack: {fileID: 3097451803507134701, guid: 8d3cffaf9c0ba834caccd9c6cae5bcc2, type: 3}
-  knightBlack: {fileID: 4224423928037025813, guid: 003f73e6b09e55c4a87a42b6b0e5e3aa, type: 3}
-  bishopBlack: {fileID: 2233954109013539951, guid: 53e127a55450c824ba3486edff9f8a05, type: 3}
-  queenBlack: {fileID: 7797760491713705488, guid: 9b7c3581c8df3e144bbb9e2140670eeb, type: 3}
-  kingBlack: {fileID: 891198545862848654, guid: 972b46e4ad69e2c478e22ae7d0a5ab6e, type: 3}
+  pawnWhite: {fileID: 5935989370726291271, guid: a90216eb40096424ba69d5a1a4717dff, type: 3}
+  rookWhite: {fileID: 441666863920156768, guid: 8d3cffaf9c0ba834caccd9c6cae5bcc2, type: 3}
+  knightWhite: {fileID: 4547724079929596675, guid: 003f73e6b09e55c4a87a42b6b0e5e3aa, type: 3}
+  bishopWhite: {fileID: 4216867269879505436, guid: 53e127a55450c824ba3486edff9f8a05, type: 3}
+  queenWhite: {fileID: 5674513684140822901, guid: 9b7c3581c8df3e144bbb9e2140670eeb, type: 3}
+  kingWhite: {fileID: 1588369776232417647, guid: 972b46e4ad69e2c478e22ae7d0a5ab6e, type: 3}
+  pawnBlack: {fileID: 6391622128191873761, guid: b78e948a94bc3684c99e75be1075ca18, type: 3}
+  rookBlack: {fileID: 8985950960021592953, guid: 5ab769575f8adef45a39573c0b06a2f1, type: 3}
+  knightBlack: {fileID: 8557951572800120888, guid: 1248d7c76db95164d88205c8a00ae15f, type: 3}
+  bishopBlack: {fileID: 661416606686121086, guid: ace250d611ac08545b496ceee58c301f, type: 3}
+  queenBlack: {fileID: 6342512109847305922, guid: b95d9db1d8402fe4c92eebac9cdbe3da, type: 3}
+  kingBlack: {fileID: 6351136002945135255, guid: 2ca48a87a53b21745a431b6bf3ca0739, type: 3}
 --- !u!4 &643861833
 Transform:
   m_ObjectHideFlags: 0

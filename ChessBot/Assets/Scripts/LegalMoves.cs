@@ -1,4 +1,4 @@
-using Chess;
+using System;
 using System.Collections.Generic;
 
 namespace Chess
@@ -19,6 +19,7 @@ namespace Chess
 
             for (int startSquare = 0; startSquare < 64; startSquare += 1)
             {
+
                 int piece = squares[startSquare];
                 if (Piece.Color(piece) != color) continue;
 
@@ -43,7 +44,6 @@ namespace Chess
                     case Piece.King:
                         moves.AddRange(GetKingMoves(squares, startSquare, color));
                         break;
-
                 }
             }
             return moves;
@@ -57,20 +57,24 @@ namespace Chess
             foreach (Move move in moves)
             {
                 int[] potentialSquares = Board.PretendExecuteMove(move);
-                if (!IsInCheck(potentialSquares, color)) validMoves.Add(move);
+                if (!IsInCheck(potentialSquares, color))
+                {
+                    validMoves.Add(move);
+                }
             }
+            return validMoves;
         }
 
         private static bool IsInCheck(int[] squares, int color)
         {
             List<Move> allMoves = GetAllMoves(squares, Piece.OppositeColor(color));
 
-            foreach (Move move in moves)
+            foreach (Move move in allMoves)
             {
                 int targetPiece = squares[move.TargetSquare];
                 if (Piece.Type(targetPiece) == Piece.King) return true;
             }
-            return true;
+            return false;
         }
 
 
@@ -82,7 +86,8 @@ namespace Chess
             foreach (int offset in offsets)
             {
                 int targetSquare = startSquare + offset;
-                if (targetSquare < 0 || targetSquare >= 64) continue;
+                if (targetSquare < 0 || targetSquare >= 64) continue;  // Stops going off the top and bottom of the board
+                if (Math.Abs(Board.File(startSquare) - Board.File(targetSquare)) > 2) continue;  // Stops going off the sides of the board 
 
                 int targetPiece = squares[targetSquare];
                 if (Piece.Color(targetPiece) != color) moves.Add(new Move(startSquare, targetSquare));
@@ -93,34 +98,59 @@ namespace Chess
 
         private static List<Move> GetKingMoves(int[] squares, int startSquare, int color)
         {
-            return GetOffsetPieceMoves(squares, startSquare, color, { 1, 7, 8, 9, -1, -7, -8, -9 }) 
+            List<Move> kingMoves = new List<Move>();
+            List<Move> possibleKingMoves = GetOffsetPieceMoves(squares, startSquare, color, new int[] { 1, 7, 8, 9, -1, -7, -8, -9 });
 
-        // Get castling moves too
-        // Stop kings from touching
+            foreach (Move move in possibleKingMoves)
+            {
+                bool tooCloseToOtherKing = false;
+                int[] possibleSquares = Board.PretendExecuteMove(move);
+                List<Move> nextKingMoves = GetOffsetPieceMoves(possibleSquares, move.StartSquare, color, new int[] { 1, 7, 8, 9, -1, -7, -8, -9 });
+
+                foreach (Move nextMove in nextKingMoves)
+                {
+                    if (Piece.Type(possibleSquares[nextMove.TargetSquare]) == Piece.King)
+                    {
+                        tooCloseToOtherKing = true;
+                    }
+                }
+
+                if (!tooCloseToOtherKing)
+                {
+                    kingMoves.Add(move);
+                }
+            }
+
+            return kingMoves;
+
+            // Get castling moves too
         }
 
         private static List<Move> GetKnightMoves(int[] squares, int startSquare, int color)
         {
-            return GetOffsetPieceMoves(squares, startSquare, color, { -10, -17, -15, -6, 10, 17, 15, 6 }) 
+            return GetOffsetPieceMoves(squares, startSquare, color, new int[] { -10, -17, -15, -6, 10, 17, 15, 6 });
         }
 
         private static List<Move> GetRookMoves(int[] squares, int startSquare, int color)
         {
             List<Move> rookMoves = new List<Move>();
-            int[] dirs = { 1, 8, -1, -8 }
+            int[] dirs = { 1, 8, -1, -8 };
 
 
-        foreach (int dir in dirs)
+            foreach (int dir in dirs)
             {
                 for (int i = 1; i < 8; i += 1)
                 {
                     int targetSquare = startSquare + dir * i;
-                    if (targetSquare < 0 || targetSquare >= 64) break;
-                    if (Math.Abs(dir) == 1 && Board.Rank(startSquare) != Board.Rank(targetSquare)) break;
-                    int targetPiece = squares[targetSquare];
+                    if (targetSquare < 0 || targetSquare >= 64) break;  // Stops going off the top and bottom of the board
+                    if (Math.Abs(dir) == 1 && Board.Rank(startSquare) != Board.Rank(targetSquare)) break;  // Stops from going accross sides of the board
 
-                    if (Piece.Color(targetPiece) != color) rookMoves.Add(new Move(startSquare, targetPiece));
-                    else break;
+                    int targetPiece = squares[targetSquare];
+                    if (Piece.Color(targetPiece) == color) break;  // Blocked by same color piece
+
+                    rookMoves.Add(new Move(startSquare, targetSquare));
+
+                    if (Piece.Color(targetPiece) == Piece.OppositeColor(color)) break;  // Blocked by capture
                 }
             }
 
@@ -130,20 +160,23 @@ namespace Chess
         private static List<Move> GetBishopMoves(int[] squares, int startSquare, int color)
         {
             List<Move> bishopMoves = new List<Move>();
-            int[] dirs = { 7, 9, -7, -9 }
+            int[] dirs = { 7, 9, -7, -9 };
 
 
-        foreach (int dir in dirs)
+            foreach (int dir in dirs)
             {
                 for (int i = 1; i < 8; i += 1)
                 {
                     int targetSquare = startSquare + dir * i;
-                    if (targetSquare < 0 || targetSquare >= 64) break;
-                    if (Math.Abs(Board.Rank(startSquare) - Board.Rank(targetSquare)) != i) break;
-                    int targetPiece = squares[targetSquare];
+                    if (targetSquare < 0 || targetSquare >= 64) break;  // Stops going off the top and bottom of the board
+                    if (Math.Abs(Board.Rank(startSquare) - Board.Rank(targetSquare)) != i) break;  // Stops from going accross sides of the board
 
-                    if (Piece.Color(targetPiece) != color) bishopMoves.Add(new Move(startSquare, targetPiece));
-                    else break;
+                    int targetPiece = squares[targetSquare];
+                    if (Piece.Color(targetPiece) == color) break;  // Blocked by same color piece
+
+                    bishopMoves.Add(new Move(startSquare, targetSquare));
+
+                    if (Piece.Color(targetPiece) == Piece.OppositeColor(color)) break;  // Blocked by capture
                 }
             }
 
@@ -157,18 +190,26 @@ namespace Chess
             int colorToCapture = Piece.OppositeColor(color);
             int forwardDir = color == Piece.White ? 1 : -1;
             int initialPawnRank = color == Piece.White ? 1 : 6;
+            int promotionRank = color == Piece.White ? 7 : 0;
 
             int forwardSquare = startSquare + 8 * forwardDir;
             int forwardPiece = squares[forwardSquare];
             if (forwardPiece == Piece.None)
             {
-                pawnMoves.Add(new Move(startSquare, forwardSquare));
+                if (Board.Rank(forwardSquare) == promotionRank)
+                {
+                    pawnMoves.Add(new Move(startSquare, forwardSquare, Move.Flag.PromoteToQueen)); // Promote to queen 
+                    pawnMoves.Add(new Move(startSquare, forwardSquare, Move.Flag.PromoteToKnight)); // Promote to knight 
+                    pawnMoves.Add(new Move(startSquare, forwardSquare, Move.Flag.PromoteToRook)); // Promote to rook
+                    pawnMoves.Add(new Move(startSquare, forwardSquare, Move.Flag.PromoteToBishop)); // Promote to bishop 
+                }
+                else pawnMoves.Add(new Move(startSquare, forwardSquare));  // Normal advance
 
-                int doubleForwardSquare = startSquare + 16 * forwardDir;
+                int twoForwardSquare = startSquare + 16 * forwardDir;
                 if (Board.Rank(startSquare) == initialPawnRank)
                 {
-                    int doubleForwardPiece = squares[doubleForwardSquare];
-                    if (doubleForwardPiece == Piece.None) pawnMoves.Add(new Move(startSquare, doubleForwardSquare));
+                    int twoForwardPiece = squares[twoForwardSquare];
+                    if (twoForwardPiece == Piece.None) pawnMoves.Add(new Move(startSquare, twoForwardSquare, Move.Flag.PawnTwoForward));  // Advance two
                 }
             }
 
@@ -176,20 +217,22 @@ namespace Chess
             {
                 int diagonalSquare = startSquare + 7 * forwardDir;
                 int diagonalPiece = squares[diagonalSquare];
-                if (Piece.Color(diagonalPiece) == colorToCapture) pawnMoves.Add(new Move(startSquare, diagonalSquare));
+                if (Piece.Color(diagonalPiece) == colorToCapture) pawnMoves.Add(new Move(startSquare, diagonalSquare));  // Normal capture
+                if (diagonalSquare == Board.VulnerableEnPassantSquare) pawnMoves.Add(new Move(startSquare, diagonalSquare, Move.Flag.EnPassantCapture));  // En passant capture
             }
 
             if ((color == Piece.White && Board.File(startSquare) != 7) || (color == Piece.Black && Board.File(startSquare) != 0))
             {
                 int diagonalSquare = startSquare + 9 * forwardDir;
                 int diagonalPiece = squares[diagonalSquare];
-                if (Piece.Color(diagonalPiece) == colorToCapture) pawnMoves.Add(new Move(startSquare, diagonalSquare));
+                if (Piece.Color(diagonalPiece) == colorToCapture) pawnMoves.Add(new Move(startSquare, diagonalSquare));  // Normal capture
+                if (diagonalSquare == Board.VulnerableEnPassantSquare) pawnMoves.Add(new Move(startSquare, diagonalSquare, Move.Flag.EnPassantCapture));  // En passant capture
+
             }
 
             return pawnMoves;
 
-            // Get en passant moves too
-            // Handle promotion?
+            // Handle promotion
         }
     }
 }

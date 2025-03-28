@@ -15,12 +15,14 @@ public class Tools : MonoBehaviour
     }
 
     [MenuItem("MY TOOLS/Get Legal Moves")]
-    public static void RunLegalMoves()
+    public static void RunGetLegalMoves()
     {
-        List<Move> moves = LegalMoves.GetLegalMoves(Board.Squares, Piece.Black);
+        List<Move> moves = LegalMoves.GetLegalMoves(Board.Squares, Piece.White);
+        Debug.Log(moves.Count + " legal moves found");
         foreach (Move move in moves)
         {
             Debug.Log(move);
         }
+        Board.tempLegalMoves = moves;
     }
 }
