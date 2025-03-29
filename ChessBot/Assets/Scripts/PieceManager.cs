@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Chess;
+// using Chess;
 
 public class PieceManager : MonoBehaviour
 {
@@ -70,12 +70,4 @@ public class PieceManager : MonoBehaviour
             Instantiate(pieceToGameObject[piece], location + centeringOffset, Quaternion.identity);
         }
     }
-
-
-    public void ShowLegalMoves(List<Move> moves)
-    {
-
-    }
-
-
 }

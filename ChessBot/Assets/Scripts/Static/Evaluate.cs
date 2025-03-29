@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using Chess;
 
-public static class Evaluate
+static class Evaluate
 {
     private static Dictionary<int, int> pieceTypeToValue = new Dictionary<int, int>{
         { 1, 100 },
@@ -14,13 +13,13 @@ public static class Evaluate
 
     public static int EvaluatePosition(int[] squares)
     {
-        int whiteValue = GetTotalPieceValue(squares, Piece.White);
-        int blackValue = GetTotalPieceValue(squares, Piece.Black);
+        int whiteValue = GetMaterialValue(squares, Piece.White);
+        int blackValue = GetMaterialValue(squares, Piece.Black);
 
         return whiteValue - blackValue;
     }
 
-    private static int GetTotalPieceValue(int[] squares, int color)
+    private static int GetMaterialValue(int[] squares, int color)
     {
         int totalValue = 0;
 
