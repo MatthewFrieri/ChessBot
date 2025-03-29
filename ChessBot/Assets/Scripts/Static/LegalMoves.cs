@@ -110,50 +110,16 @@ static class LegalMoves
 
     private static List<Move> GetKingMoves(Board board, GameState gameState, int startSquare)
     {
-        List<Move> legalKingMoves = new List<Move>();
         int[] offsets = new int[] { 1, 7, 8, 9, -1, -7, -8, -9 };
-
-        List<Move> pseudoLegalKingMoves = GetOffsetPieceMoves(board, gameState, startSquare, offsets);
-
-        int enemyKing = Piece.King | Piece.OppositeColor(gameState.ColorToMove);
-        int enemyKingSquare = -1;  // Will be overridden for sure
-
-        for (int square = 0; square < 64; square += 1)
-        {
-            int piece = board.PieceAt(square);
-            if (piece == enemyKing)
-            {
-                enemyKingSquare = square;
-                break;
-            }
-        }
-
-        foreach (Move move in pseudoLegalKingMoves)
-        {
-            bool tooCloseToOtherKing = false;
-
-            foreach (int offset in offsets)
-            {
-                if (move.TargetSquare + offset == enemyKingSquare)
-                {
-                    tooCloseToOtherKing = true;
-                }
-            }
-
-            if (!tooCloseToOtherKing)
-            {
-                legalKingMoves.Add(move);
-            }
-        }
-
-        return legalKingMoves;
+        return GetOffsetPieceMoves(board, gameState, startSquare, offsets);
 
         // Get castling moves too
     }
 
     private static List<Move> GetKnightMoves(Board board, GameState gameState, int startSquare)
     {
-        return GetOffsetPieceMoves(board, gameState, startSquare, new int[] { -10, -17, -15, -6, 10, 17, 15, 6 });
+        int[] offsets = new int[] { -10, -17, -15, -6, 10, 17, 15, 6 };
+        return GetOffsetPieceMoves(board, gameState, startSquare, offsets);
     }
 
     private static List<Move> GetRookMoves(Board board, GameState gameState, int startSquare)

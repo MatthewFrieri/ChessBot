@@ -48,7 +48,7 @@ public class GameState
         }
     }
 
-    public void LoadFromFEN(string fen)
+    private void LoadFromFEN(string fen)
     {
         string[] elements = fen.Split(" ");
 
@@ -65,7 +65,7 @@ public class GameState
         string fullMove = elements[5];   // NEED TO USE
 
         colorToMove = activeColor == "w" ? Piece.White : Piece.Black;
-        vulnerableEnPassantSquare = Board.AlgebraicToSquare(vulnerableEnPassantAlgebraic);
+        vulnerableEnPassantSquare = vulnerableEnPassantAlgebraic == "-" ? -1 : Board.AlgebraicToSquare(vulnerableEnPassantAlgebraic);
     }
 
     public string HalfFEN()
@@ -76,7 +76,7 @@ public class GameState
         fen += " ";
         fen += "-";  // TEMPORARY
         fen += " ";
-        fen += Board.SquareToAlgebraic(vulnerableEnPassantSquare);
+        fen += vulnerableEnPassantSquare == -1 ? "-" : Board.SquareToAlgebraic(vulnerableEnPassantSquare);
         fen += " ";
         fen += "999";  // TEMPORARY
         fen += " ";

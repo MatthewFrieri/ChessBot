@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-// using Chess;
 
-public class PieceManager : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
 
     public GameObject pawnWhite;
@@ -12,6 +11,7 @@ public class PieceManager : MonoBehaviour
     public GameObject bishopWhite;
     public GameObject queenWhite;
     public GameObject kingWhite;
+
     public GameObject pawnBlack;
     public GameObject rookBlack;
     public GameObject knightBlack;
@@ -21,7 +21,10 @@ public class PieceManager : MonoBehaviour
 
     private Dictionary<int, GameObject> pieceToGameObject = new Dictionary<int, GameObject>();
 
-    void Start()
+    private Game game;
+    private GameObject[] pieceObjects;
+
+    private void Start()
     {
         pieceToGameObject[Piece.Pawn | Piece.White] = pawnWhite;
         pieceToGameObject[Piece.Rook | Piece.White] = rookWhite;
@@ -35,39 +38,34 @@ public class PieceManager : MonoBehaviour
         pieceToGameObject[Piece.Bishop | Piece.Black] = bishopBlack;
         pieceToGameObject[Piece.Queen | Piece.Black] = queenBlack;
         pieceToGameObject[Piece.King | Piece.Black] = kingBlack;
-        InstantiatePieces();
-    }
 
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        foreach (Move move in Board.tempLegalMoves)
+        game = new Game(Piece.White);
+
+        pieceObjects = new GameObject[64];
+        InstantiatePieceObjects();
+
+        List<Move> legalMoves = LegalMoves.GetLegalMoves(game.Board, game.GameState);
+
+        foreach (Move move in legalMoves)
         {
-            if (Piece.Type(Board.Squares[move.StartSquare]) == Piece.Pawn)
-            {
-                Vector2 location = new Vector2(Board.File(move.TargetSquare) + 0.5f, Board.Rank(move.TargetSquare) + 0.5f);
-                Gizmos.DrawSphere(location, 0.3f);
-
-            }
+            Debug.Log(move);
         }
+
     }
 
 
-    void InstantiatePieces()
+    private void InstantiatePieceObjects()
     {
-
-        Board.LoadFromFEN("8/8/8/r2Pp2K/8/8/8/8 w - - 0 1");
-
-        int[] squares = Board.Squares;
-        for (int square = 0; square < 64; square += 1)
+        for (int i = 0; i < 64; i += 1)
         {
-            int piece = squares[square];
+            int piece = game.Board.PieceAt(i);
+
             if (piece == Piece.None) continue;
 
-            Vector2 location = new Vector2(Board.File(square), Board.Rank(square));
-            Vector2 centeringOffset = new Vector2(0.5f, 0.5f);
+            GameObject pieceObject = pieceToGameObject[piece];
 
-            Instantiate(pieceToGameObject[piece], location + centeringOffset, Quaternion.identity);
+            pieceObjects[i] = Instantiate(pieceObject, Helpers.SquareToLocation(i), Quaternion.identity);
         }
     }
+
 }

@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 
-
 public class Board
 {
     private int[] squares;
 
     public Board()
     {
-        squares = new int[64];
+        LoadFromFEN(Game.StartingFEN);
     }
 
     public Board(string fen)
@@ -54,8 +53,9 @@ public class Board
         }
     }
 
-    public void LoadFromFEN(string fen)
+    private void LoadFromFEN(string fen)
     {
+        squares = new int[64];
 
         Dictionary<char, int> symbolToPiece = new Dictionary<char, int>{
             {'p', Piece.Pawn},
@@ -69,7 +69,9 @@ public class Board
         int rank = 7;
         int file = 0;
 
-        foreach (char symbol in fen.Split(' ')[0])
+        string piecePlacement = fen.Split(' ')[0];
+
+        foreach (char symbol in piecePlacement)
         {
             if (symbol == '/')
             {
@@ -97,7 +99,7 @@ public class Board
 
     public string HalfFEN()
     {
-        Dictionary<int, char> pieceToSymbol = new Dictionary<int, char>{
+        Dictionary<int, char> pieceTypeToSymbol = new Dictionary<int, char>{
             {Piece.Pawn, 'p'},
             {Piece.Rook, 'r'},
             {Piece.Knight, 'n'},
@@ -128,7 +130,7 @@ public class Board
                     emptySquareStreak = 0;
                 }
 
-                char baseSymbol = pieceToSymbol[piece];
+                char baseSymbol = pieceTypeToSymbol[Piece.Type(piece)];
                 char symbol = Piece.IsWhite(piece) ? char.ToUpper(baseSymbol) : baseSymbol;
                 fen += symbol;
             }
@@ -138,7 +140,7 @@ public class Board
                 fen += emptySquareStreak;
             }
 
-            if (rank < 7)
+            if (rank != 0)
             {
                 fen += "/";
             }
