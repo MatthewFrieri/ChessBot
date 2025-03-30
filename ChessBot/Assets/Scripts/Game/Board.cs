@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class Board
 {
@@ -22,8 +23,8 @@ public class Board
 
     public void RecordMove(Move move)
     {
-        int friendlyColor = Piece.Color(squares[move.StartSquare]);
-        squares[move.TargetSquare] = squares[move.StartSquare];
+        int friendlyColor = Piece.Color(PieceAt(move.StartSquare));
+        squares[move.TargetSquare] = PieceAt(move.StartSquare);
         squares[move.StartSquare] = Piece.None;
 
         switch (move.MoveFlag)
@@ -157,22 +158,6 @@ public class Board
     public static int Rank(int square)
     {
         return square / 8;
-    }
-
-    public static int AlgebraicToSquare(string algebraic)
-    {
-        int file = algebraic[0] - 'a';
-        int rank = algebraic[1];
-
-        return 8 * rank + file;
-    }
-
-    public static string SquareToAlgebraic(int square)
-    {
-        string file = ((char)('a' + File(square))).ToString();
-        string rank = Rank(square).ToString();
-
-        return file + rank;
     }
 
     public static Board Copy(Board board)

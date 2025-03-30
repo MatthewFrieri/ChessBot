@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -22,7 +23,6 @@ public class GameManager : MonoBehaviour
     private Dictionary<int, GameObject> pieceToGameObject = new Dictionary<int, GameObject>();
 
     private Game game;
-    private GameObject[] pieceObjects;
 
     private void Start()
     {
@@ -39,33 +39,18 @@ public class GameManager : MonoBehaviour
         pieceToGameObject[Piece.Queen | Piece.Black] = queenBlack;
         pieceToGameObject[Piece.King | Piece.Black] = kingBlack;
 
-        game = new Game(Piece.White);
+        game = new Game(Piece.Black, pieceToGameObject);
 
-        pieceObjects = new GameObject[64];
-        InstantiatePieceObjects();
+        // List<Move> legalMoves = LegalMoves.GetLegalMoves(game.Board, game.GameState);
 
-        List<Move> legalMoves = LegalMoves.GetLegalMoves(game.Board, game.GameState);
-
-        foreach (Move move in legalMoves)
-        {
-            Debug.Log(move);
-        }
-
+        // foreach (Move move in legalMoves)
+        // {
+        //     Debug.Log(move);
+        // }
     }
 
 
-    private void InstantiatePieceObjects()
-    {
-        for (int i = 0; i < 64; i += 1)
-        {
-            int piece = game.Board.PieceAt(i);
 
-            if (piece == Piece.None) continue;
 
-            GameObject pieceObject = pieceToGameObject[piece];
-
-            pieceObjects[i] = Instantiate(pieceObject, Helpers.SquareToLocation(i), Quaternion.identity);
-        }
-    }
 
 }

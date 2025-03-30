@@ -191,10 +191,10 @@ static class LegalMoves
         {
             if (Board.Rank(forwardSquare) == promotionRank)
             {
-                pawnMoves.Add(new Move(startSquare, forwardSquare, Move.Flag.PromoteToQueen)); // Promote to queen 
-                pawnMoves.Add(new Move(startSquare, forwardSquare, Move.Flag.PromoteToKnight)); // Promote to knight 
-                pawnMoves.Add(new Move(startSquare, forwardSquare, Move.Flag.PromoteToRook)); // Promote to rook
-                pawnMoves.Add(new Move(startSquare, forwardSquare, Move.Flag.PromoteToBishop)); // Promote to bishop 
+                pawnMoves.Add(new Move(startSquare, forwardSquare, Move.Flag.PromoteToQueen));  // Promote to queen 
+                pawnMoves.Add(new Move(startSquare, forwardSquare, Move.Flag.PromoteToKnight));  // Promote to knight 
+                pawnMoves.Add(new Move(startSquare, forwardSquare, Move.Flag.PromoteToRook));  // Promote to rook
+                pawnMoves.Add(new Move(startSquare, forwardSquare, Move.Flag.PromoteToBishop));  // Promote to bishop 
             }
             else pawnMoves.Add(new Move(startSquare, forwardSquare));  // Normal advance
 
@@ -206,21 +206,37 @@ static class LegalMoves
             }
         }
 
-        if ((whiteToMove && Board.File(startSquare) != 0) || (!whiteToMove && Board.File(startSquare) != 7))
+        void HandlePawnDiagonal(int offset, Board board, GameState gameState, int startSquare, List<Move> pawnMoves, int forwardDir, int colorToCapture, int promotionRank)
         {
-            int diagonalSquare = startSquare + 7 * forwardDir;
+            int diagonalSquare = startSquare + offset * forwardDir;
             int diagonalPiece = board.PieceAt(diagonalSquare);
-            if (Piece.Color(diagonalPiece) == colorToCapture) { pawnMoves.Add(new Move(startSquare, diagonalSquare)); }  // Normal capture
+            if (Piece.Color(diagonalPiece) == colorToCapture)
+            {
+                if (Board.Rank(diagonalSquare) == promotionRank)
+                {
+                    pawnMoves.Add(new Move(startSquare, diagonalSquare, Move.Flag.PromoteToQueen));  // Capture and promote to queen 
+                    pawnMoves.Add(new Move(startSquare, diagonalSquare, Move.Flag.PromoteToKnight));  // Capture and promote to knight 
+                    pawnMoves.Add(new Move(startSquare, diagonalSquare, Move.Flag.PromoteToRook));  // Capture and promote to rook
+                    pawnMoves.Add(new Move(startSquare, diagonalSquare, Move.Flag.PromoteToBishop));  // Capture and promote to bishop 
+                }
+                else
+                {
+                    pawnMoves.Add(new Move(startSquare, diagonalSquare));  // Normal capture
+                }
+            }
             if (diagonalSquare == gameState.VulnerableEnPassantSquare) { pawnMoves.Add(new Move(startSquare, diagonalSquare, Move.Flag.EnPassantCapture)); } // En passant capture
         }
 
+        // Left diagonal
+        if ((whiteToMove && Board.File(startSquare) != 0) || (!whiteToMove && Board.File(startSquare) != 7))
+        {
+            HandlePawnDiagonal(7, board, gameState, startSquare, pawnMoves, forwardDir, colorToCapture, promotionRank);
+        }
+
+        // Right diagonal
         if ((whiteToMove && Board.File(startSquare) != 7) || (!whiteToMove && Board.File(startSquare) != 0))
         {
-            int diagonalSquare = startSquare + 9 * forwardDir;
-            int diagonalPiece = board.PieceAt(diagonalSquare);
-            if (Piece.Color(diagonalPiece) == colorToCapture) { pawnMoves.Add(new Move(startSquare, diagonalSquare)); }  // Normal capture
-            if (diagonalSquare == gameState.VulnerableEnPassantSquare) { pawnMoves.Add(new Move(startSquare, diagonalSquare, Move.Flag.EnPassantCapture)); }  // En passant capture
-
+            HandlePawnDiagonal(9, board, gameState, startSquare, pawnMoves, forwardDir, colorToCapture, promotionRank);
         }
 
         return pawnMoves;

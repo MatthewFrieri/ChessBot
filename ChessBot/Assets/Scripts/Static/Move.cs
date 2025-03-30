@@ -54,7 +54,11 @@ public readonly struct Move
 
     public override string ToString()
     {
-        return $"Move: StartSquare={StartSquare}, TargetSquare={TargetSquare}";
+        if (MoveFlag == Flag.None)
+        {
+            return $"Move: StartSquare={StartSquare}, TargetSquare={TargetSquare}";
+        }
+        return $"Move: StartSquare={StartSquare}, TargetSquare={TargetSquare}, Flag={MoveFlag}";
     }
 
 }

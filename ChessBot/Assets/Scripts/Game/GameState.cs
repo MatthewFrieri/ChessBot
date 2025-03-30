@@ -8,8 +8,7 @@ public class GameState
 
     public GameState()
     {
-        colorToMove = Piece.White;
-        vulnerableEnPassantSquare = -1;
+        LoadFromFEN(Game.StartingFEN);
     }
 
     public GameState(string fen)
@@ -65,7 +64,7 @@ public class GameState
         string fullMove = elements[5];   // NEED TO USE
 
         colorToMove = activeColor == "w" ? Piece.White : Piece.Black;
-        vulnerableEnPassantSquare = vulnerableEnPassantAlgebraic == "-" ? -1 : Board.AlgebraicToSquare(vulnerableEnPassantAlgebraic);
+        vulnerableEnPassantSquare = vulnerableEnPassantAlgebraic == "-" ? -1 : Helpers.AlgebraicToSquare(vulnerableEnPassantAlgebraic);
     }
 
     public string HalfFEN()
@@ -76,7 +75,7 @@ public class GameState
         fen += " ";
         fen += "-";  // TEMPORARY
         fen += " ";
-        fen += vulnerableEnPassantSquare == -1 ? "-" : Board.SquareToAlgebraic(vulnerableEnPassantSquare);
+        fen += vulnerableEnPassantSquare == -1 ? "-" : Helpers.SquareToAlgebraic(vulnerableEnPassantSquare);
         fen += " ";
         fen += "999";  // TEMPORARY
         fen += " ";
