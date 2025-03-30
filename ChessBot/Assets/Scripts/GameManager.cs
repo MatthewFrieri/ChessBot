@@ -22,6 +22,9 @@ public class GameManager : MonoBehaviour
 
     private Dictionary<int, GameObject> pieceToGameObject = new Dictionary<int, GameObject>();
 
+    public GameObject captureIndicator;
+    public GameObject moveIndicator;
+
     private Game game;
 
     private void Start()

@@ -28,7 +28,7 @@ public class ObjectBoard
             if (Piece.Color(piece) == game.Player.color)
             {
                 PieceObject pieceObjectScript = pieceObjectClone.AddComponent<PieceObject>();
-                pieceObjectScript.Player = game.Player;
+                pieceObjectScript.Game = game;
             }
 
             pieceObjects[i] = pieceObjectClone;
@@ -59,7 +59,7 @@ public class ObjectBoard
             GameObject pieceObject = game.PieceToGameObject[newPiece | friendlyColor];
             GameObject pieceObjectClone = Object.Instantiate(pieceObject, Helpers.SquareToLocation(move.TargetSquare), Quaternion.identity);
             PieceObject pieceObjectScript = pieceObjectClone.AddComponent<PieceObject>();
-            pieceObjectScript.Player = game.Player;
+            pieceObjectScript.Game = game;
             Object.Destroy(pieceObjects[move.TargetSquare]);
             pieceObjects[move.TargetSquare] = pieceObjectClone;
         }

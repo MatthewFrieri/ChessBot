@@ -4,25 +4,51 @@ using UnityEngine;
 
 public class PieceObject : MonoBehaviour
 {
-    private Player player;
+    private Game game;
 
     Vector2 startPosition;
     List<int> targetSquares;
+    bool isSelected = false;
 
-    public Player Player
+    GameObject captureIndicator;
+    GameObject moveIndicator;
+    List<GameObject> activeIndicators = new List<GameObject>();
+
+    public Game Game
     {
         set
         {
-            player = value;
+            game = value;
         }
     }
 
+    private void Awake()
+    {
+        GameManager gameManager = FindObjectOfType<GameManager>();
+        captureIndicator = gameManager.captureIndicator;
+        moveIndicator = gameManager.moveIndicator;
+    }
 
     private void OnMouseDown()
     {
         startPosition = transform.position;
         int startSquare = Helpers.LocationToSquare(transform.position);
-        targetSquares = player.GetLegalTargetSquares(startSquare);
+        targetSquares = game.Player.GetLegalTargetSquares(startSquare);
+
+        foreach (int targetSquare in targetSquares)
+        {
+            if (game.Board.PieceAt(targetSquare) == Piece.None)
+            {
+                GameObject indicator = Instantiate(moveIndicator, Helpers.SquareToLocation(targetSquare), Quaternion.identity);
+                activeIndicators.Add(indicator);
+            }
+            else
+            {
+                GameObject indicator = Instantiate(captureIndicator, Helpers.SquareToLocation(targetSquare), Quaternion.identity);
+                activeIndicators.Add(indicator);
+            }
+        }
+
     }
 
     private void OnMouseDrag()
@@ -33,7 +59,25 @@ public class PieceObject : MonoBehaviour
 
     private void OnMouseUp()
     {
+        int startSquare = Helpers.LocationToSquare(startPosition);
+        int targetSquare = Helpers.LocationToSquare(transform.position);
         transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+
+        // // TODO Selecting not dragging
+        // if (startSquare == targetSquare)
+        // {
+        //     transform.position = Helpers.SquareToLocation(targetSquare);
+        //     isSelected = true;
+        //     return;
+        // }
+
+        // Remove indicators
+        foreach (GameObject indicator in activeIndicators)
+        {
+            Destroy(indicator);
+        }
+        activeIndicators = new List<GameObject>();
+
 
         // Out of bounds
         if (transform.position.x < 0 || transform.position.x > 8 || transform.position.y < 0 || transform.position.y > 8)
@@ -41,7 +85,6 @@ public class PieceObject : MonoBehaviour
             transform.position = startPosition;
         }
 
-        int targetSquare = Helpers.LocationToSquare(transform.position);
 
         if (targetSquares.Contains(targetSquare))
         {
@@ -50,8 +93,7 @@ public class PieceObject : MonoBehaviour
             transform.position = targetPosition;
 
             // Make the move
-            int startSquare = Helpers.LocationToSquare(startPosition);
-            player.MakeMove(startSquare, targetSquare);
+            game.Player.MakeMove(startSquare, targetSquare);
         }
         else
         {

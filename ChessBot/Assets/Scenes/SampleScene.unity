@@ -159,7 +159,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.26152235, g: 0.26010147, b: 0.3301887, a: 0}
+  m_BackGroundColor: {r: 0.3026507, g: 0.29659134, b: 0.4056604, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -328,18 +328,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cf1a4682625cf04fb22cb1e22703ed8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pawnWhite: {fileID: 5935989370726291271, guid: a90216eb40096424ba69d5a1a4717dff, type: 3}
-  rookWhite: {fileID: 441666863920156768, guid: 8d3cffaf9c0ba834caccd9c6cae5bcc2, type: 3}
-  knightWhite: {fileID: 4547724079929596675, guid: 003f73e6b09e55c4a87a42b6b0e5e3aa, type: 3}
-  bishopWhite: {fileID: 4216867269879505436, guid: 53e127a55450c824ba3486edff9f8a05, type: 3}
-  queenWhite: {fileID: 5674513684140822901, guid: 9b7c3581c8df3e144bbb9e2140670eeb, type: 3}
-  kingWhite: {fileID: 1588369776232417647, guid: 972b46e4ad69e2c478e22ae7d0a5ab6e, type: 3}
-  pawnBlack: {fileID: 6391622128191873761, guid: b78e948a94bc3684c99e75be1075ca18, type: 3}
-  rookBlack: {fileID: 8985950960021592953, guid: 5ab769575f8adef45a39573c0b06a2f1, type: 3}
-  knightBlack: {fileID: 8557951572800120888, guid: 1248d7c76db95164d88205c8a00ae15f, type: 3}
-  bishopBlack: {fileID: 661416606686121086, guid: ace250d611ac08545b496ceee58c301f, type: 3}
-  queenBlack: {fileID: 6342512109847305922, guid: b95d9db1d8402fe4c92eebac9cdbe3da, type: 3}
-  kingBlack: {fileID: 6351136002945135255, guid: 2ca48a87a53b21745a431b6bf3ca0739, type: 3}
+  pawnWhite: {fileID: 6082871036150555424, guid: 7f2a667daf150ed4ab89ceb830b396e0, type: 3}
+  rookWhite: {fileID: 5264545029294846424, guid: 80cce545cac8d2e4985630fc324c3ac6, type: 3}
+  knightWhite: {fileID: 5591646262047045365, guid: ee9fc62e30eeb0d499c1bcd3e0d37efb, type: 3}
+  bishopWhite: {fileID: 7050779653793378375, guid: 0e26ded54b8297f419403c9fed0792cf, type: 3}
+  queenWhite: {fileID: 3601656098714115700, guid: 4f09b672c437f5f4d9ad2eb29bd7c8c7, type: 3}
+  kingWhite: {fileID: 7634884834841409214, guid: 05d0e9f91c5948c4392c8e466c9021ad, type: 3}
+  pawnBlack: {fileID: 3821791150691933156, guid: 90433649b5ed55543942d6bb25581864, type: 3}
+  rookBlack: {fileID: 1087502020713281462, guid: cf17805623d1cad44b40f6a3f6184891, type: 3}
+  knightBlack: {fileID: 8019630523610932060, guid: e308d3f9f0b2440418adc6ee157d4559, type: 3}
+  bishopBlack: {fileID: 3155395103924299456, guid: f73d397298b3c14428443217c8a301c1, type: 3}
+  queenBlack: {fileID: 3188721435061713913, guid: fe62010e869a1a847ba2aa3666a4cd9e, type: 3}
+  kingBlack: {fileID: 4832633494161725723, guid: ea599154cc777bf47a11ac7d299a5581, type: 3}
+  captureIndicator: {fileID: 3675688726001728484, guid: e90658bf340c1fa42b6cfe5351b6b9fe, type: 3}
+  moveIndicator: {fileID: 3125535501794463143, guid: 93a5636b289c2af49ba85f8fbf052dec, type: 3}
 --- !u!4 &1146255398
 Transform:
   m_ObjectHideFlags: 0
