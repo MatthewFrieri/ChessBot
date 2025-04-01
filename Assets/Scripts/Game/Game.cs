@@ -21,9 +21,18 @@ public class Game
         board = new Board();
         gameState = new GameState();
         player = new Player(this, Piece.OppositeColor(botColor));
-        player.CurrentLegalMoves = LegalMoves.GetLegalMoves(board, gameState);
         bot = new Bot(this, botColor);
         objectBoard = new ObjectBoard(this);
+
+
+        if (botColor == Piece.White)
+        {
+            bot.MakeMove();
+        }
+        else
+        {
+            player.CurrentLegalMoves = LegalMoves.GetLegalMoves(board, gameState);
+        }
     }
 
     public Board Board

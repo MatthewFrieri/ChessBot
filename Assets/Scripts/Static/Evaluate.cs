@@ -11,20 +11,30 @@ static class Evaluate
         { 6, 0 }
     };
 
-    public static int EvaluatePosition(int[] squares)
+    public static int EvaluatePosition(Board board, GameState gameState)
     {
-        int whiteValue = GetMaterialValue(squares, Piece.White);
-        int blackValue = GetMaterialValue(squares, Piece.Black);
 
-        return whiteValue - blackValue;
+        List<Move> legalMoves = LegalMoves.GetLegalMoves(board, gameState);
+        if (legalMoves.Count == 0)
+        {
+            return int.MinValue;
+        }
+
+        int perspective = gameState.ColorToMove == Piece.White ? 1 : -1;
+
+        int whiteValue = GetMaterialValue(board, Piece.White);
+        int blackValue = GetMaterialValue(board, Piece.Black);
+
+        return (whiteValue - blackValue) * perspective;
     }
 
-    private static int GetMaterialValue(int[] squares, int color)
+    private static int GetMaterialValue(Board board, int color)
     {
         int totalValue = 0;
 
-        foreach (int piece in squares)
+        for (int i = 0; i < 64; i += 1)
         {
+            int piece = board.PieceAt(i);
             if (Piece.Color(piece) == color)
             {
                 totalValue += pieceTypeToValue[Piece.Type(piece)];
