@@ -36,7 +36,27 @@ public class Board
                 squares[enPassantCaptureSquare] = Piece.None;
                 break;
             case Move.Flag.Castling:
+                switch (move.TargetSquare)
+                {
+                    case 6:  // White king side castle
+                        squares[5] = PieceAt(7);
+                        squares[7] = Piece.None;
+                        break;
+                    case 2:  // White queen side castle
+                        squares[3] = PieceAt(0);
+                        squares[0] = Piece.None;
+                        break;
+                    case 62:  // Black king side castle
+                        squares[61] = PieceAt(63);
+                        squares[63] = Piece.None;
+                        break;
+                    case 58:  // Black queen side castle
+                        squares[59] = PieceAt(56);
+                        squares[56] = Piece.None;
+                        break;
+                }
                 break;
+
             case Move.Flag.PromoteToQueen:
                 squares[move.TargetSquare] = Piece.Queen | friendlyColor;
                 break;

@@ -87,6 +87,63 @@ static class LegalMoves
         return false;
     }
 
+    private static bool IsSquareUnderEnemyAttack(Board board, GameState gameState, int square)
+    {
+        int enemyColor = Piece.OppositeColor(gameState.ColorToMove);
+        int[] knightOffsets = { -10, -17, -15, -6, 10, 17, 15, 6 };
+        int[] pawnOffsets = enemyColor == Piece.White ? new int[] { -7, -9 } : new int[] { 7, 9 };
+        int[] kingOffsets = { 1, 7, 8, 9, -1, -7, -8, -9 };
+        int[] rookDirs = { 1, 8, -1, -8 };
+        int[] bishopDirs = { 7, 9, -7, -9 };
+
+        foreach (int offset in knightOffsets)
+        {
+            int targetSquare = square + offset;
+            if (targetSquare < 0 || targetSquare >= 64) continue;  // Stops going off the top and bottom of the board
+            if (Math.Abs(Board.File(targetSquare) - Board.File(targetSquare)) > 2) continue;  // Stops going off the sides of the board 
+            if (board.PieceAt(targetSquare) == (Piece.Knight | enemyColor)) { return true; }
+        }
+        foreach (int offset in pawnOffsets)
+        {
+            int targetSquare = square + offset;
+            if (targetSquare < 0 || targetSquare >= 64) continue;  // Stops going off the top and bottom of the board
+            if (Math.Abs(Board.File(targetSquare) - Board.File(targetSquare)) > 1) continue;  // Stops going off the sides of the board 
+            if (board.PieceAt(targetSquare) == (Piece.Pawn | enemyColor)) { return true; }
+        }
+        foreach (int offset in kingOffsets)
+        {
+            int targetSquare = square + offset;
+            if (targetSquare < 0 || targetSquare >= 64) continue;  // Stops going off the top and bottom of the board
+            if (Math.Abs(Board.File(targetSquare) - Board.File(targetSquare)) > 1) continue;  // Stops going off the sides of the board 
+            if (board.PieceAt(targetSquare) == (Piece.King | enemyColor)) { return true; }
+        }
+        foreach (int dir in rookDirs)
+        {
+            for (int i = 1; i < 8; i += 1)
+            {
+                int targetSquare = square + dir * i;
+                if (targetSquare < 0 || targetSquare >= 64) break;  // Stops going off the top and bottom of the board
+                if (Math.Abs(dir) == 1 && Board.Rank(square) != Board.Rank(targetSquare)) break;  // Stops from going accross sides of the board
+                int targetPiece = board.PieceAt(targetSquare);
+                if (targetPiece == (Piece.Rook | enemyColor) || targetPiece == (Piece.Queen | enemyColor)) { return true; }
+                if (targetPiece != Piece.None) break;  // Stop this direction if a piece is hit
+            }
+        }
+        foreach (int dir in bishopDirs)
+        {
+            for (int i = 1; i < 8; i += 1)
+            {
+                int targetSquare = square + dir * i;
+                if (targetSquare < 0 || targetSquare >= 64) break;  // Stops going off the top and bottom of the board
+                if (Math.Abs(Board.Rank(square) - Board.Rank(targetSquare)) != i) break;  // Stops from going accross sides of the board
+                int targetPiece = board.PieceAt(targetSquare);
+                if (targetPiece == (Piece.Bishop | enemyColor) || targetPiece == (Piece.Queen | enemyColor)) { return true; }
+                if (targetPiece != Piece.None) break;  // Stop this direction if a piece is hit
+            }
+        }
+        return false;
+    }
+
 
     private static List<Move> GetOffsetPieceMoves(Board board, GameState gameState, int startSquare, int[] offsets)
     {
@@ -110,10 +167,65 @@ static class LegalMoves
 
     private static List<Move> GetKingMoves(Board board, GameState gameState, int startSquare)
     {
-        int[] offsets = new int[] { 1, 7, 8, 9, -1, -7, -8, -9 };
-        return GetOffsetPieceMoves(board, gameState, startSquare, offsets);
+        int[] offsets = { 1, 7, 8, 9, -1, -7, -8, -9 };
+        List<Move> kingMoves = GetOffsetPieceMoves(board, gameState, startSquare, offsets);
 
-        // Get castling moves too
+        // Add castle moves
+        foreach (int castleSquare in gameState.CastleSquares)
+        {
+            if (Board.Rank(castleSquare) == Board.Rank(startSquare))
+            {
+
+                // Make sure the path is not blocked
+                switch (castleSquare)
+                {
+                    case 6:
+                        if (board.PieceAt(5) == Piece.None &&
+                        board.PieceAt(6) == Piece.None &&
+                        !IsSquareUnderEnemyAttack(board, gameState, startSquare) &&
+                        !IsSquareUnderEnemyAttack(board, gameState, 5) &&
+                        !IsSquareUnderEnemyAttack(board, gameState, 6))
+                        {
+                            kingMoves.Add(new Move(startSquare, castleSquare, Move.Flag.Castling));
+                        }
+                        break;
+                    case 2:
+                        if (board.PieceAt(3) == Piece.None &&
+                        board.PieceAt(2) == Piece.None &&
+                        board.PieceAt(1) == Piece.None &&
+                        !IsSquareUnderEnemyAttack(board, gameState, startSquare) &&
+                        !IsSquareUnderEnemyAttack(board, gameState, 3) &&
+                        !IsSquareUnderEnemyAttack(board, gameState, 2))
+                        {
+                            kingMoves.Add(new Move(startSquare, castleSquare, Move.Flag.Castling));
+                        }
+                        break;
+                    case 62:
+                        if (board.PieceAt(61) == Piece.None &&
+                        board.PieceAt(62) == Piece.None &&
+                        !IsSquareUnderEnemyAttack(board, gameState, startSquare) &&
+                        !IsSquareUnderEnemyAttack(board, gameState, 61) &&
+                        !IsSquareUnderEnemyAttack(board, gameState, 62))
+                        {
+                            kingMoves.Add(new Move(startSquare, castleSquare, Move.Flag.Castling));
+                        }
+                        break;
+                    case 58:
+                        if (board.PieceAt(59) == Piece.None &&
+                        board.PieceAt(58) == Piece.None &&
+                        board.PieceAt(57) == Piece.None &&
+                        !IsSquareUnderEnemyAttack(board, gameState, startSquare) &&
+                        !IsSquareUnderEnemyAttack(board, gameState, 59) &&
+                        !IsSquareUnderEnemyAttack(board, gameState, 58))
+                        {
+                            kingMoves.Add(new Move(startSquare, castleSquare, Move.Flag.Castling));
+                        }
+                        break;
+                }
+            }
+        }
+
+        return kingMoves;
     }
 
     private static List<Move> GetKnightMoves(Board board, GameState gameState, int startSquare)

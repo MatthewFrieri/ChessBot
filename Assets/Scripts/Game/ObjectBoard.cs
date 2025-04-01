@@ -13,6 +13,12 @@ public class ObjectBoard
         InstantiatePieceObjects();
     }
 
+    public GameObject PieceObjectAt(int square)
+    {
+        return pieceObjects[square];
+    }
+
+
     private void InstantiatePieceObjects()
     {
         for (int i = 0; i < 64; i += 1)
@@ -40,18 +46,16 @@ public class ObjectBoard
 
     public void RecordMove(Move move)
     {
-        Debug.Log(move);
-
 
         int friendlyColor = Piece.Color(game.Board.PieceAt(move.StartSquare));
 
-        if (pieceObjects[move.TargetSquare] != null)
+        if (PieceObjectAt(move.TargetSquare) != null)
         {
-            Object.Destroy(pieceObjects[move.TargetSquare]);
+            Object.Destroy(PieceObjectAt(move.TargetSquare));
         }
 
-        pieceObjects[move.StartSquare].transform.position = Helpers.SquareToLocation(move.TargetSquare);
-        pieceObjects[move.TargetSquare] = pieceObjects[move.StartSquare];
+        PieceObjectAt(move.StartSquare).transform.position = Helpers.SquareToLocation(move.TargetSquare);
+        pieceObjects[move.TargetSquare] = PieceObjectAt(move.StartSquare);
         pieceObjects[move.StartSquare] = null;
 
         void HandlePromotion(int newPiece)
@@ -60,10 +64,9 @@ public class ObjectBoard
             GameObject pieceObjectClone = Object.Instantiate(pieceObject, Helpers.SquareToLocation(move.TargetSquare), Quaternion.identity);
             PieceObject pieceObjectScript = pieceObjectClone.AddComponent<PieceObject>();
             pieceObjectScript.Game = game;
-            Object.Destroy(pieceObjects[move.TargetSquare]);
+            Object.Destroy(PieceObjectAt(move.TargetSquare));
             pieceObjects[move.TargetSquare] = pieceObjectClone;
         }
-
 
         switch (move.MoveFlag)
         {
@@ -72,13 +75,36 @@ public class ObjectBoard
 
             case Move.Flag.EnPassantCapture:
                 int enPassantCaptureSquare = move.StartSquare < move.TargetSquare ? move.TargetSquare - 8 : move.TargetSquare + 8;
-                if (pieceObjects[enPassantCaptureSquare] != null)
+                if (PieceObjectAt(enPassantCaptureSquare) != null)
                 {
-                    Object.Destroy(pieceObjects[enPassantCaptureSquare]);
+                    Object.Destroy(PieceObjectAt(enPassantCaptureSquare));
                 }
                 break;
 
             case Move.Flag.Castling:
+                switch (move.TargetSquare)
+                {
+                    case 6:  // White king side castle
+                        PieceObjectAt(7).transform.position = Helpers.SquareToLocation(5);
+                        pieceObjects[5] = PieceObjectAt(7);
+                        pieceObjects[7] = null;
+                        break;
+                    case 2:  // White queen side castle
+                        PieceObjectAt(0).transform.position = Helpers.SquareToLocation(3);
+                        pieceObjects[3] = PieceObjectAt(0);
+                        pieceObjects[0] = null;
+                        break;
+                    case 62:  // Black king side castle
+                        PieceObjectAt(63).transform.position = Helpers.SquareToLocation(61);
+                        pieceObjects[61] = PieceObjectAt(63);
+                        pieceObjects[63] = null;
+                        break;
+                    case 58:  // Black queen side castle
+                        PieceObjectAt(56).transform.position = Helpers.SquareToLocation(59);
+                        pieceObjects[59] = PieceObjectAt(56);
+                        pieceObjects[56] = null;
+                        break;
+                }
                 break;
 
             case Move.Flag.PromoteToQueen:
