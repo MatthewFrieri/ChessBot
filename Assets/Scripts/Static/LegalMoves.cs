@@ -352,8 +352,6 @@ static class LegalMoves
         }
 
         return pawnMoves;
-
-        // Handle promotion
     }
 }
 

@@ -8,7 +8,6 @@ public class PieceObject : MonoBehaviour
 
     Vector2 startPosition;
     List<int> targetSquares;
-    bool isSelected = false;
 
     GameObject captureIndicator;
     GameObject moveIndicator;
