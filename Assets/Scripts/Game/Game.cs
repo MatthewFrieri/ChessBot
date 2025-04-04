@@ -12,20 +12,17 @@ public class Game
     private Player player;
     private Bot bot;
 
-    public static string StartingFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-
-    public Game(int botColor, Dictionary<int, GameObject> pieceToGameObject)
+    public Game(string fen, int botColor, Dictionary<int, GameObject> pieceToGameObject)
     {
         this.pieceToGameObject = pieceToGameObject;
 
-        board = new Board();
-        gameState = new GameState();
+        board = new Board(fen);
+        gameState = new GameState(fen);
         player = new Player(this, Piece.OppositeColor(botColor));
         bot = new Bot(this, botColor);
         objectBoard = new ObjectBoard(this);
 
-
-        if (botColor == Piece.White)
+        if (gameState.ColorToMove == botColor)
         {
             bot.MakeMove();
         }
@@ -69,6 +66,11 @@ public class Game
         {
             return pieceToGameObject;
         }
+    }
+
+    public string Fen()
+    {
+        return board.HalfFen() + " " + gameState.HalfFen();
     }
 
     public void Start()

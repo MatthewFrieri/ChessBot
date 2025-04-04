@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 static class Evaluate
 {
@@ -11,13 +12,17 @@ static class Evaluate
         { 6, 0 }
     };
 
-    public static int EvaluatePosition(Board board, GameState gameState)
+    public static int EvaluatePosition(Board board, GameState gameState, List<Move> legalMoves)
     {
-
-        List<Move> legalMoves = LegalMoves.GetLegalMoves(board, gameState);
         if (legalMoves.Count == 0)
         {
-            return int.MinValue;
+            int friendlyKingSquare = LegalMoves.FindFriendlyKingSquare(board, gameState);
+
+            if (LegalMoves.IsSquareUnderAttack(board, friendlyKingSquare, Piece.OppositeColor(gameState.ColorToMove)))
+            {
+                return -Helpers.CheckmateEval;  // Checkmate
+            }
+            return 0;  // Draw
         }
 
         int perspective = gameState.ColorToMove == Piece.White ? 1 : -1;

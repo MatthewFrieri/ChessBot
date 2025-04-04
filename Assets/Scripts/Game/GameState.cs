@@ -7,11 +7,6 @@ public class GameState
     private int vulnerableEnPassantSquare;
     private List<int> castleSquares = new List<int>();
 
-    public GameState()
-    {
-        LoadFromFEN(Game.StartingFEN);
-    }
-
     public GameState(string fen)
     {
         LoadFromFEN(fen);
@@ -114,7 +109,7 @@ public class GameState
         vulnerableEnPassantSquare = vulnerableEnPassantAlgebraic == "-" ? -1 : Helpers.AlgebraicToSquare(vulnerableEnPassantAlgebraic);
     }
 
-    public string HalfFEN()
+    public string HalfFen()
     {
         string fen = "";
 
@@ -141,7 +136,7 @@ public class GameState
 
     public static GameState Copy(GameState gameState)
     {
-        return new GameState(gameState.HalfFEN());
+        return new GameState(gameState.HalfFen());
     }
 
 }

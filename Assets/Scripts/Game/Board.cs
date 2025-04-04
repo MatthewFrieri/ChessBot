@@ -1,15 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class Board
 {
     private int[] squares;
-
-    public Board()
-    {
-        LoadFromFEN(Game.StartingFEN);
-    }
 
     public Board(string fen)
     {
@@ -118,7 +112,7 @@ public class Board
         }
     }
 
-    public string HalfFEN()
+    public string HalfFen()
     {
         Dictionary<int, char> pieceTypeToSymbol = new Dictionary<int, char>{
             {Piece.Pawn, 'p'},
@@ -182,7 +176,7 @@ public class Board
 
     public static Board Copy(Board board)
     {
-        return new Board(board.HalfFEN());
+        return new Board(board.HalfFen());
     }
 
 }

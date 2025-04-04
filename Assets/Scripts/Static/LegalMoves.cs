@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 
 static class LegalMoves
@@ -53,9 +54,10 @@ static class LegalMoves
     {
         List<Move> safeMoves = new List<Move>();
 
+        int friendlyKingSquare = FindFriendlyKingSquare(board, gameState);
+
         foreach (Move move in moves)
         {
-
             // Simulate making the move
             Board boardCopy = Board.Copy(board);
             GameState gameStateCopy = GameState.Copy(gameState);
@@ -63,8 +65,17 @@ static class LegalMoves
             boardCopy.RecordMove(move);
             gameStateCopy.RecordMove(move);
 
+            // Use the TargetSquare if the king is moving
+            if (move.StartSquare == friendlyKingSquare)
+            {
+                if (!IsSquareUnderAttack(boardCopy, move.TargetSquare, gameStateCopy.ColorToMove))
+                {
+                    safeMoves.Add(move);
+                }
+            }
 
-            if (!IsInCheck(boardCopy, gameStateCopy))
+            // The king is not moving so friendlyKingSquare is acurate
+            else if (!IsSquareUnderAttack(boardCopy, friendlyKingSquare, gameStateCopy.ColorToMove))
             {
                 safeMoves.Add(move);
             }
@@ -72,24 +83,20 @@ static class LegalMoves
         return safeMoves;
     }
 
-    private static bool IsInCheck(Board board, GameState gameState)
+    public static int FindFriendlyKingSquare(Board board, GameState gameState)
     {
-        // This can be optimized to start from the king and go out
-        // I reused GetPseudoLegalMoves because im lazy
-
-        List<Move> allMoves = GetPseudoLegalMoves(board, gameState);
-
-        foreach (Move move in allMoves)
+        for (int i = 0; i < 64; i += 1)
         {
-            int targetPiece = board.PieceAt(move.TargetSquare);
-            if (Piece.Type(targetPiece) == Piece.King) return true;
+            if (board.PieceAt(i) == (Piece.King | gameState.ColorToMove))
+            {
+                return i;
+            }
         }
-        return false;
+        return -1;  // This line will never get reached
     }
 
-    private static bool IsSquareUnderEnemyAttack(Board board, GameState gameState, int square)
+    public static bool IsSquareUnderAttack(Board board, int square, int enemyColor)
     {
-        int enemyColor = Piece.OppositeColor(gameState.ColorToMove);
         int[] knightOffsets = { -10, -17, -15, -6, 10, 17, 15, 6 };
         int[] pawnOffsets = enemyColor == Piece.White ? new int[] { -7, -9 } : new int[] { 7, 9 };
         int[] kingOffsets = { 1, 7, 8, 9, -1, -7, -8, -9 };
@@ -100,21 +107,21 @@ static class LegalMoves
         {
             int targetSquare = square + offset;
             if (targetSquare < 0 || targetSquare >= 64) continue;  // Stops going off the top and bottom of the board
-            if (Math.Abs(Board.File(targetSquare) - Board.File(targetSquare)) > 2) continue;  // Stops going off the sides of the board 
+            if (Math.Abs(Board.File(square) - Board.File(targetSquare)) > 2) continue;  // Stops going off the sides of the board 
             if (board.PieceAt(targetSquare) == (Piece.Knight | enemyColor)) { return true; }
         }
         foreach (int offset in pawnOffsets)
         {
             int targetSquare = square + offset;
             if (targetSquare < 0 || targetSquare >= 64) continue;  // Stops going off the top and bottom of the board
-            if (Math.Abs(Board.File(targetSquare) - Board.File(targetSquare)) > 1) continue;  // Stops going off the sides of the board 
+            if (Math.Abs(Board.File(square) - Board.File(targetSquare)) > 1) continue;  // Stops going off the sides of the board 
             if (board.PieceAt(targetSquare) == (Piece.Pawn | enemyColor)) { return true; }
         }
         foreach (int offset in kingOffsets)
         {
             int targetSquare = square + offset;
             if (targetSquare < 0 || targetSquare >= 64) continue;  // Stops going off the top and bottom of the board
-            if (Math.Abs(Board.File(targetSquare) - Board.File(targetSquare)) > 1) continue;  // Stops going off the sides of the board 
+            if (Math.Abs(Board.File(square) - Board.File(targetSquare)) > 1) continue;  // Stops going off the sides of the board 
             if (board.PieceAt(targetSquare) == (Piece.King | enemyColor)) { return true; }
         }
         foreach (int dir in rookDirs)
@@ -167,6 +174,7 @@ static class LegalMoves
 
     private static List<Move> GetKingMoves(Board board, GameState gameState, int startSquare)
     {
+        int enemyColor = Piece.OppositeColor(gameState.ColorToMove);
         int[] offsets = { 1, 7, 8, 9, -1, -7, -8, -9 };
         List<Move> kingMoves = GetOffsetPieceMoves(board, gameState, startSquare, offsets);
 
@@ -182,9 +190,9 @@ static class LegalMoves
                     case 6:
                         if (board.PieceAt(5) == Piece.None &&
                         board.PieceAt(6) == Piece.None &&
-                        !IsSquareUnderEnemyAttack(board, gameState, startSquare) &&
-                        !IsSquareUnderEnemyAttack(board, gameState, 5) &&
-                        !IsSquareUnderEnemyAttack(board, gameState, 6))
+                        !IsSquareUnderAttack(board, startSquare, enemyColor) &&
+                        !IsSquareUnderAttack(board, 5, enemyColor) &&
+                        !IsSquareUnderAttack(board, 6, enemyColor))
                         {
                             kingMoves.Add(new Move(startSquare, castleSquare, Move.Flag.Castling));
                         }
@@ -193,9 +201,9 @@ static class LegalMoves
                         if (board.PieceAt(3) == Piece.None &&
                         board.PieceAt(2) == Piece.None &&
                         board.PieceAt(1) == Piece.None &&
-                        !IsSquareUnderEnemyAttack(board, gameState, startSquare) &&
-                        !IsSquareUnderEnemyAttack(board, gameState, 3) &&
-                        !IsSquareUnderEnemyAttack(board, gameState, 2))
+                        !IsSquareUnderAttack(board, startSquare, enemyColor) &&
+                        !IsSquareUnderAttack(board, 3, enemyColor) &&
+                        !IsSquareUnderAttack(board, 2, enemyColor))
                         {
                             kingMoves.Add(new Move(startSquare, castleSquare, Move.Flag.Castling));
                         }
@@ -203,9 +211,9 @@ static class LegalMoves
                     case 62:
                         if (board.PieceAt(61) == Piece.None &&
                         board.PieceAt(62) == Piece.None &&
-                        !IsSquareUnderEnemyAttack(board, gameState, startSquare) &&
-                        !IsSquareUnderEnemyAttack(board, gameState, 61) &&
-                        !IsSquareUnderEnemyAttack(board, gameState, 62))
+                        !IsSquareUnderAttack(board, startSquare, enemyColor) &&
+                        !IsSquareUnderAttack(board, 61, enemyColor) &&
+                        !IsSquareUnderAttack(board, 62, enemyColor))
                         {
                             kingMoves.Add(new Move(startSquare, castleSquare, Move.Flag.Castling));
                         }
@@ -214,9 +222,9 @@ static class LegalMoves
                         if (board.PieceAt(59) == Piece.None &&
                         board.PieceAt(58) == Piece.None &&
                         board.PieceAt(57) == Piece.None &&
-                        !IsSquareUnderEnemyAttack(board, gameState, startSquare) &&
-                        !IsSquareUnderEnemyAttack(board, gameState, 59) &&
-                        !IsSquareUnderEnemyAttack(board, gameState, 58))
+                        !IsSquareUnderAttack(board, startSquare, enemyColor) &&
+                        !IsSquareUnderAttack(board, 59, enemyColor) &&
+                        !IsSquareUnderAttack(board, 58, enemyColor))
                         {
                             kingMoves.Add(new Move(startSquare, castleSquare, Move.Flag.Castling));
                         }

@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -25,6 +23,7 @@ public class GameManager : MonoBehaviour
     public GameObject captureIndicator;
     public GameObject moveIndicator;
 
+    private const string StartingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     private Game game;
 
     private void Start()
@@ -42,18 +41,6 @@ public class GameManager : MonoBehaviour
         pieceToGameObject[Piece.Queen | Piece.Black] = queenBlack;
         pieceToGameObject[Piece.King | Piece.Black] = kingBlack;
 
-        game = new Game(Piece.Black, pieceToGameObject);
-
-        // List<Move> legalMoves = LegalMoves.GetLegalMoves(game.Board, game.GameState);
-
-        // foreach (Move move in legalMoves)
-        // {
-        //     Debug.Log(move);
-        // }
+        game = new Game("k1K5/p7/P1N5/1P6/4pP2/2p1P3/pp6/r3Q3 w - - 0 1", Piece.White, pieceToGameObject);
     }
-
-
-
-
-
 }

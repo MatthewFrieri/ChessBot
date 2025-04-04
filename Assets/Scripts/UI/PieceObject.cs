@@ -47,7 +47,6 @@ public class PieceObject : MonoBehaviour
                 activeIndicators.Add(indicator);
             }
         }
-
     }
 
     private void OnMouseDrag()

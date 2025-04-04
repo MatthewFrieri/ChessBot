@@ -7,6 +7,8 @@ public class Bot
 {
     private Game game;
     public int color;
+    private Move invalidMove = new Move(0, 0);
+    private Move moveToPlay;
 
     public Bot(Game game, int color)
     {
@@ -16,43 +18,28 @@ public class Bot
 
     public void MakeMove()
     {
-        List<Move> legalMoves = LegalMoves.GetLegalMoves(game.Board, game.GameState);
-        int depth = 2;
+        int depth = 5;  // Must be at least 1
+        // Can solve a mate in (depth + 1) // 2
 
-        int bestEvaluation = int.MinValue;
-        Move bestMove = legalMoves[0];
+        Search(game.Board, game.GameState, depth, 0, Helpers.NegativeInfinity, Helpers.PositiveInfinity);
 
+        Debug.Log(moveToPlay);
 
-        foreach (Move move in legalMoves)
-        {
-            Board boardCopy = Board.Copy(game.Board);
-            GameState gameStateCopy = GameState.Copy(game.GameState);
+        game.ExecuteMove(moveToPlay);
 
-            boardCopy.RecordMove(move);
-            gameStateCopy.RecordMove(move);
-
-            int evaluation = -Search(depth, boardCopy, gameStateCopy);
-
-            if (evaluation > bestEvaluation)
-            {
-                bestEvaluation = evaluation;
-                bestMove = move;
-            }
-        }
-
-        game.ExecuteMove(bestMove);
     }
 
-    private int Search(int depth, Board board, GameState gameState)
+    private int Search(Board board, GameState gameState, int depth, int plyFromRoot, int alpha, int beta)
     {
-        if (depth == 0)
+        List<Move> legalMoves = LegalMoves.GetLegalMoves(board, gameState);
+
+        if (depth == 0 || legalMoves.Count == 0)
         {
-            return Evaluate.EvaluatePosition(board, gameState);
+            return Evaluate.EvaluatePosition(board, gameState, legalMoves) - plyFromRoot;  // - plyFromRoot prioritizes mates that happen sooner 
         }
 
         int bestEvaluation = int.MinValue;
-
-        List<Move> legalMoves = LegalMoves.GetLegalMoves(board, gameState);
+        Move bestMove = invalidMove;
 
         foreach (Move move in legalMoves)
         {
@@ -62,10 +49,25 @@ public class Bot
             boardCopy.RecordMove(move);
             gameStateCopy.RecordMove(move);
 
-            int evaluation = -Search(depth - 1, boardCopy, gameStateCopy);
+            int evaluation = -Search(boardCopy, gameStateCopy, depth - 1, plyFromRoot + 1, -beta, -alpha);
 
-            bestEvaluation = Math.Max(bestEvaluation, evaluation);
+            if (evaluation > bestEvaluation)
+            {
+                bestEvaluation = evaluation;
+                bestMove = move;
+            }
+
+            alpha = Math.Max(alpha, bestEvaluation);
+            if (alpha >= beta) { break; }  // Prune branch
         }
+
+        if (depth == 5)
+        {
+            Debug.Log(bestEvaluation);
+        }
+
+
+        moveToPlay = bestMove;
         return bestEvaluation;
     }
 
