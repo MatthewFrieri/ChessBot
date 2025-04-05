@@ -3,6 +3,7 @@ using System;
 static class Zobrist
 {
     const int seed = 236192;
+    static Random random = new Random(seed);
     static ulong[,,] piecesAndSquares = new ulong[6, 2, 64];
     static ulong[] castlingRights = new ulong[4];
     static ulong[] enPassantFiles = new ulong[8];
@@ -79,7 +80,6 @@ static class Zobrist
 
     private static ulong GenerateRandomUlong()
     {
-        Random random = new Random();
         byte[] bytes = new byte[8];
         random.NextBytes(bytes);
         return BitConverter.ToUInt64(bytes, 0);

@@ -18,7 +18,7 @@ public class Bot
 
     public void MakeMove()
     {
-        int depth = 5;  // Must be at least 1
+        int depth = 3;  // Must be at least 1
         // Can solve a mate in (depth + 1) // 2
 
         Search(game.Board, game.GameState, depth, 0, Helpers.NegativeInfinity, Helpers.PositiveInfinity);
@@ -64,11 +64,6 @@ public class Bot
             if (ttEvaluation is null)
             {
                 TranspositionTable.StorePosition(boardCopy, gameStateCopy, evaluation, depth - 1);
-                Debug.Log("updated tt");
-            }
-            else
-            {
-                Debug.Log("used tt");
             }
 
             // Remember the best move and evaluation
@@ -80,11 +75,6 @@ public class Bot
 
             alpha = Math.Max(alpha, bestEvaluation);
             if (alpha >= beta) { break; }  // Prune branch
-        }
-
-        if (depth == 5)
-        {
-            Debug.Log(bestEvaluation);
         }
 
         moveToPlay = bestMove;
