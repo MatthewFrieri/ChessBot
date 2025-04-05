@@ -35,7 +35,8 @@ public class Bot
 
         if (depth == 0 || legalMoves.Count == 0)
         {
-            return Evaluate.EvaluatePosition(board, gameState, legalMoves) - plyFromRoot;  // - plyFromRoot prioritizes mates that happen sooner 
+            int eval = Evaluate.EvaluatePosition(board, gameState, legalMoves);
+            return eval == -Helpers.CheckmateEval ? eval + plyFromRoot : eval;  // plyFromRoot prioritizes mates that happen sooner 
         }
 
         int bestEvaluation = int.MinValue;
