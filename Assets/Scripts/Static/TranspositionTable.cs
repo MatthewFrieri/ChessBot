@@ -25,4 +25,9 @@ static class TranspositionTable
         zobristToEval[key] = (evaluation, depth);
     }
 
+
+    public static int Size()
+    {
+        return zobristToEval.Count;
+    }
 }

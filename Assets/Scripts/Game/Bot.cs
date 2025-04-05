@@ -27,6 +27,8 @@ public class Bot
 
         game.ExecuteMove(moveToPlay);
 
+        Debug.Log("TT size = " + TranspositionTable.Size());
+
     }
 
     private int Search(Board board, GameState gameState, int depth, int plyFromRoot, int alpha, int beta)
@@ -50,8 +52,26 @@ public class Bot
             boardCopy.RecordMove(move);
             gameStateCopy.RecordMove(move);
 
-            int evaluation = -Search(boardCopy, gameStateCopy, depth - 1, plyFromRoot + 1, -beta, -alpha);
 
+            // Check transposition table for an evaluation
+            int? ttEvaluation = TranspositionTable.TryLookupPosition(boardCopy, gameStateCopy, depth - 1);
+
+            int evaluation = ttEvaluation is int eval
+            ? evaluation = eval
+            : -Search(boardCopy, gameStateCopy, depth - 1, plyFromRoot + 1, -beta, -alpha);
+
+            // Update transposition table if needed
+            if (ttEvaluation is null)
+            {
+                TranspositionTable.StorePosition(boardCopy, gameStateCopy, evaluation, depth - 1);
+                Debug.Log("updated tt");
+            }
+            else
+            {
+                Debug.Log("used tt");
+            }
+
+            // Remember the best move and evaluation
             if (evaluation > bestEvaluation)
             {
                 bestEvaluation = evaluation;
