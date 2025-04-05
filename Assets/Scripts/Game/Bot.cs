@@ -44,9 +44,9 @@ public class Bot
 
         foreach (Move move in legalMoves)
         {
+            // Pretend to make the move
             Board boardCopy = Board.Copy(board);
             GameState gameStateCopy = GameState.Copy(gameState);
-
             boardCopy.RecordMove(move);
             gameStateCopy.RecordMove(move);
 
@@ -66,7 +66,6 @@ public class Bot
         {
             Debug.Log(bestEvaluation);
         }
-
 
         moveToPlay = bestMove;
         return bestEvaluation;

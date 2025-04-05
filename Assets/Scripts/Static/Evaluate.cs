@@ -37,7 +37,7 @@ static class Evaluate
     {
         int totalValue = 0;
 
-        for (int i = 0; i < 64; i += 1)
+        for (int i = 0; i < 64; i++)
         {
             int piece = board.PieceAt(i);
             if (Piece.Color(piece) == color)

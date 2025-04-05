@@ -4,7 +4,7 @@ using System.Linq;
 public class GameState
 {
     private int colorToMove;
-    private int vulnerableEnPassantSquare;
+    private int? vulnerableEnPassantSquare;
     private List<int> castleSquares = new List<int>();
 
     public GameState(string fen)
@@ -21,7 +21,7 @@ public class GameState
         }
     }
 
-    public int VulnerableEnPassantSquare
+    public int? VulnerableEnPassantSquare
     {
         get
         {
@@ -52,7 +52,7 @@ public class GameState
         }
         else
         {
-            vulnerableEnPassantSquare = -1;
+            vulnerableEnPassantSquare = null;
         }
 
 
@@ -106,7 +106,7 @@ public class GameState
         if (castlingRights.Contains("k")) { castleSquares.Add(62); }
         if (castlingRights.Contains("q")) { castleSquares.Add(58); }
 
-        vulnerableEnPassantSquare = vulnerableEnPassantAlgebraic == "-" ? -1 : Helpers.AlgebraicToSquare(vulnerableEnPassantAlgebraic);
+        vulnerableEnPassantSquare = vulnerableEnPassantAlgebraic == "-" ? null : Helpers.AlgebraicToSquare(vulnerableEnPassantAlgebraic);
     }
 
     public string HalfFen()
@@ -124,9 +124,11 @@ public class GameState
         fen += castleSquares.Count == 0 ? "-" : castlingRights;
         fen += " ";
 
-        fen += vulnerableEnPassantSquare == -1 ? "-" : Helpers.SquareToAlgebraic(vulnerableEnPassantSquare);
-        fen += " ";
+        fen += vulnerableEnPassantSquare is int vulnerableSquare
+        ? Helpers.SquareToAlgebraic(vulnerableSquare)
+        : "-";
 
+        fen += " ";
         fen += "999";  // TEMPORARY
         fen += " ";
         fen += "999";  // TEMPORARY

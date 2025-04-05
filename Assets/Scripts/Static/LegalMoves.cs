@@ -17,7 +17,7 @@ static class LegalMoves
     {
         List<Move> moves = new List<Move>();
 
-        for (int startSquare = 0; startSquare < 64; startSquare += 1)
+        for (int startSquare = 0; startSquare < 64; startSquare++)
         {
 
             int piece = board.PieceAt(startSquare);
@@ -85,7 +85,7 @@ static class LegalMoves
 
     public static int FindFriendlyKingSquare(Board board, GameState gameState)
     {
-        for (int i = 0; i < 64; i += 1)
+        for (int i = 0; i < 64; i++)
         {
             if (board.PieceAt(i) == (Piece.King | gameState.ColorToMove))
             {
@@ -126,7 +126,7 @@ static class LegalMoves
         }
         foreach (int dir in rookDirs)
         {
-            for (int i = 1; i < 8; i += 1)
+            for (int i = 1; i < 8; i++)
             {
                 int targetSquare = square + dir * i;
                 if (targetSquare < 0 || targetSquare >= 64) break;  // Stops going off the top and bottom of the board
@@ -138,7 +138,7 @@ static class LegalMoves
         }
         foreach (int dir in bishopDirs)
         {
-            for (int i = 1; i < 8; i += 1)
+            for (int i = 1; i < 8; i++)
             {
                 int targetSquare = square + dir * i;
                 if (targetSquare < 0 || targetSquare >= 64) break;  // Stops going off the top and bottom of the board
@@ -250,7 +250,7 @@ static class LegalMoves
 
         foreach (int dir in dirs)
         {
-            for (int i = 1; i < 8; i += 1)
+            for (int i = 1; i < 8; i++)
             {
                 int targetSquare = startSquare + dir * i;
                 if (targetSquare < 0 || targetSquare >= 64) break;  // Stops going off the top and bottom of the board
@@ -277,7 +277,7 @@ static class LegalMoves
 
         foreach (int dir in dirs)
         {
-            for (int i = 1; i < 8; i += 1)
+            for (int i = 1; i < 8; i++)
             {
                 int targetSquare = startSquare + dir * i;
                 if (targetSquare < 0 || targetSquare >= 64) break;  // Stops going off the top and bottom of the board

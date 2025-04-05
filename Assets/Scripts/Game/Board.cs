@@ -125,10 +125,10 @@ public class Board
 
         string fen = "";
 
-        for (int rank = 7; rank >= 0; rank -= 1)
+        for (int rank = 7; rank >= 0; rank--)
         {
             int emptySquareStreak = 0;
-            for (int file = 0; file < 8; file += 1)
+            for (int file = 0; file < 8; file++)
             {
                 int square = 8 * rank + file;
                 int piece = PieceAt(square);

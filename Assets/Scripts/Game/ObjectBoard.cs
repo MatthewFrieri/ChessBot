@@ -21,7 +21,7 @@ public class ObjectBoard
 
     private void InstantiatePieceObjects()
     {
-        for (int i = 0; i < 64; i += 1)
+        for (int i = 0; i < 64; i++)
         {
             int piece = game.Board.PieceAt(i);
 
