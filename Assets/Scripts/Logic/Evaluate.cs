@@ -11,6 +11,7 @@ static class Evaluate
         { 5, 900 },
         { 6, 0 }
     };
+    private const int CheckmateEval = 10000;
 
     public static int Value(int piece)
     {
@@ -25,7 +26,7 @@ static class Evaluate
 
             if (LegalMoves.IsSquareUnderAttack(friendlyKingSquare, Piece.OppositeColor(GameState.ColorToMove)))
             {
-                return -Helpers.CheckmateEval;  // Checkmate
+                return -CheckmateEval;  // Checkmate
             }
             return 0;  // Draw
         }

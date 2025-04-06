@@ -2,9 +2,6 @@ using UnityEngine;
 
 static class Helpers
 {
-    public const int CheckmateEval = 10000;
-    public const int PositiveInfinity = 999999;
-    public const int NegativeInfinity = -PositiveInfinity;
 
     public static string SquareToAlgebraic(int square)
     {

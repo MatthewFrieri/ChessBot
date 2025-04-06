@@ -5,6 +5,9 @@ static class Bot
     private static int color;
     private static Move moveToPlay;
 
+    private const int PositiveInfinity = 999999;
+    private const int NegativeInfinity = -PositiveInfinity;
+
     public static void Init(int color)
     {
         Bot.color = color;
@@ -25,7 +28,7 @@ static class Bot
         int depth = 5;  // Must be at least 1
         // Can solve a mate in (depth + 1) // 2
 
-        Search.RecursiveSearch(depth, 0, Helpers.NegativeInfinity, Helpers.PositiveInfinity);
+        Search.RecursiveSearch(depth, 0, NegativeInfinity, PositiveInfinity);
 
         Game.ExecuteMove(moveToPlay);
     }
