@@ -6,6 +6,8 @@ public class GameState
     private int colorToMove;
     private int? vulnerableEnPassantSquare;
     private List<int> castleSquares = new List<int>();
+    private int halfMoveClock;
+    private int fullMoveNumber;
 
     public GameState(string fen)
     {
@@ -37,7 +39,7 @@ public class GameState
         }
     }
 
-    public void ToggleColorToMove()
+    private void ToggleColorToMove()
     {
         colorToMove = Piece.OppositeColor(colorToMove);
     }
@@ -45,6 +47,13 @@ public class GameState
     public void RecordMove(Move move)
     {
         ToggleColorToMove();
+
+        // TODO update halfMoveClock 
+
+        if (colorToMove == Piece.White)
+        {
+            fullMoveNumber += 1;
+        }
 
         if (move.MoveFlag == Move.Flag.PawnTwoForward)
         {
@@ -93,13 +102,13 @@ public class GameState
             elements = elements.Prepend("").ToArray();
         }
 
-        string activeColor = elements[1];
+        string colorToMove = elements[1];
         string castlingRights = elements[2];
         string vulnerableEnPassantAlgebraic = elements[3];
         string halfMoveClock = elements[4];   // NEED TO USE
-        string fullMove = elements[5];   // NEED TO USE
+        string fullMoveNumber = elements[5];   // NEED TO USE
 
-        colorToMove = activeColor == "w" ? Piece.White : Piece.Black;
+        this.colorToMove = colorToMove == "w" ? Piece.White : Piece.Black;
 
         if (castlingRights.Contains("K")) { castleSquares.Add(6); }
         if (castlingRights.Contains("Q")) { castleSquares.Add(2); }
@@ -107,6 +116,11 @@ public class GameState
         if (castlingRights.Contains("q")) { castleSquares.Add(58); }
 
         vulnerableEnPassantSquare = vulnerableEnPassantAlgebraic == "-" ? null : Helpers.AlgebraicToSquare(vulnerableEnPassantAlgebraic);
+
+        this.halfMoveClock = int.Parse(halfMoveClock);
+
+        this.fullMoveNumber = int.Parse(fullMoveNumber);
+
     }
 
     public string HalfFen()
@@ -129,9 +143,10 @@ public class GameState
         : "-";
 
         fen += " ";
-        fen += "999";  // TEMPORARY
+        fen += halfMoveClock;
+
         fen += " ";
-        fen += "999";  // TEMPORARY
+        fen += fullMoveNumber;
 
         return fen;
     }
