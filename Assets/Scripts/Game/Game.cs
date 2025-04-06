@@ -11,9 +11,9 @@ static class Game
 
         Board.Init(fen);
         GameState.Init(fen);
-        ObjectBoard.Init();
         Player.Init(Piece.OppositeColor(botColor));
         Bot.Init(botColor);
+        ObjectBoard.Init();  // ObjectBoard.Init() must be called after Board.Init() and Player.Init()
 
         if (GameState.ColorToMove == botColor)
         {
@@ -39,7 +39,7 @@ static class Game
 
     public static void ExecuteMove(Move move)
     {
-        // ObjectBoard.RecordMove() must happen before Board.RecordMove() and GameState.RecordMove()
+        // RecordMove() must happen in this order
         ObjectBoard.RecordMove(move);
         Board.RecordMove(move);
         GameState.RecordMove(move);

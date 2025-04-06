@@ -79,8 +79,8 @@ static class LegalMoves
 
 
             // Undo the pretend move
-            Board.UnRecordMove(move);
-            GameState.UnRecordMove(move);
+            Board.UnRecordMove();
+            GameState.UnRecordMove();
         }
 
         return safeMoves;

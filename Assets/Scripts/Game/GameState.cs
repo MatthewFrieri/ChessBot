@@ -1,89 +1,99 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 
 static class GameState
 {
-    private static int colorToMove;
-    private static int? vulnerableEnPassantSquare;
-    private static List<int> castleSquares = new List<int>();
-    private static int halfMoveClock;
-    private static int fullMoveNumber;
+    private static Stack<int> colorToMoveStack;
+    private static Stack<int?> vulnerableEnPassantSquareStack;
+    private static Stack<List<int>> castleSquaresStack;
+    private static Stack<int> halfMoveClockStack;
+    private static Stack<int> fullMoveNumberStack;
 
     public static void Init(string fen)
     {
+        colorToMoveStack = new Stack<int>();
+        vulnerableEnPassantSquareStack = new Stack<int?>();
+        castleSquaresStack = new Stack<List<int>>();
+        halfMoveClockStack = new Stack<int>();
+        fullMoveNumberStack = new Stack<int>();
         LoadFromFEN(fen);
     }
 
     public static int ColorToMove
     {
-        get { return colorToMove; }
+        get { return colorToMoveStack.Peek(); }
     }
 
     public static int? VulnerableEnPassantSquare
     {
-        get { return vulnerableEnPassantSquare; }
+        get { return vulnerableEnPassantSquareStack.Peek(); }
     }
 
     public static List<int> CastleSquares
     {
-        get { return castleSquares; }
+        get { return castleSquaresStack.Peek(); }
     }
 
-    private static void ToggleColorToMove()
+    public static int HalfMoveClock
     {
-        colorToMove = Piece.OppositeColor(colorToMove);
+        get { return halfMoveClockStack.Peek(); }
     }
 
-    public static void UnRecordMove(Move move)
+    public static int FullMoveNumber
     {
+        get { return fullMoveNumberStack.Peek(); }
+    }
 
+    public static void UnRecordMove()
+    {
+        colorToMoveStack.Pop();
+        vulnerableEnPassantSquareStack.Pop();
+        castleSquaresStack.Pop();
+        halfMoveClockStack.Pop();
+        fullMoveNumberStack.Pop();
     }
 
     public static void RecordMove(Move move)
     {
-        ToggleColorToMove();
+        colorToMoveStack.Push(Piece.OppositeColor(ColorToMove));
 
         // TODO update halfMoveClock 
+        halfMoveClockStack.Push(HalfMoveClock);
 
-        if (colorToMove == Piece.White)
-        {
-            fullMoveNumber += 1;
-        }
+        int newFullMoveNumber = ColorToMove == Piece.White ? FullMoveNumber + 1 : FullMoveNumber;
+        fullMoveNumberStack.Push(newFullMoveNumber);
 
-        if (move.MoveFlag == Move.Flag.PawnTwoForward)
-        {
-            vulnerableEnPassantSquare = move.StartSquare < move.TargetSquare ? move.StartSquare + 8 : move.StartSquare - 8;
-        }
-        else
-        {
-            vulnerableEnPassantSquare = null;
-        }
+        int? newVulnerableEnPassantSquare = move.MoveFlag == Move.Flag.PawnTwoForward
+        ? (move.StartSquare < move.TargetSquare ? move.StartSquare + 8 : move.StartSquare - 8)
+        : null;
+        vulnerableEnPassantSquareStack.Push(newVulnerableEnPassantSquare);
 
-
+        List<int> newCastleSquares = new List<int>(CastleSquares);
         switch (move.StartSquare)
         {
             case 4:  // White king moved
-                castleSquares.Remove(6);
-                castleSquares.Remove(2);
+                newCastleSquares.Remove(6);
+                newCastleSquares.Remove(2);
                 break;
             case 60:  // Black king moved
-                castleSquares.Remove(62);
-                castleSquares.Remove(58);
+                newCastleSquares.Remove(62);
+                newCastleSquares.Remove(58);
                 break;
             case 0:  // a1 rook moved
-                castleSquares.Remove(2);
+                newCastleSquares.Remove(2);
                 break;
             case 7:  // h1 rook moved
-                castleSquares.Remove(6);
+                newCastleSquares.Remove(6);
                 break;
             case 56:  // a8 rook moved
-                castleSquares.Remove(58);
+                newCastleSquares.Remove(58);
                 break;
             case 63:  // h8 rook moved
-                castleSquares.Remove(62);
+                newCastleSquares.Remove(62);
                 break;
         }
-
+        castleSquaresStack.Push(newCastleSquares);
 
     }
 
@@ -103,18 +113,20 @@ static class GameState
         string halfMoveClock = elements[4];   // NEED TO USE
         string fullMoveNumber = elements[5];   // NEED TO USE
 
-        GameState.colorToMove = colorToMove == "w" ? Piece.White : Piece.Black;
+        colorToMoveStack.Push(colorToMove == "w" ? Piece.White : Piece.Black);
 
+        List<int> castleSquares = new List<int>();
         if (castlingRights.Contains("K")) { castleSquares.Add(6); }
         if (castlingRights.Contains("Q")) { castleSquares.Add(2); }
         if (castlingRights.Contains("k")) { castleSquares.Add(62); }
         if (castlingRights.Contains("q")) { castleSquares.Add(58); }
+        castleSquaresStack.Push(castleSquares);
 
-        vulnerableEnPassantSquare = vulnerableEnPassantAlgebraic == "-" ? null : Helpers.AlgebraicToSquare(vulnerableEnPassantAlgebraic);
+        vulnerableEnPassantSquareStack.Push(vulnerableEnPassantAlgebraic == "-" ? null : Helpers.AlgebraicToSquare(vulnerableEnPassantAlgebraic));
 
-        GameState.halfMoveClock = int.Parse(halfMoveClock);
+        halfMoveClockStack.Push(int.Parse(halfMoveClock));
 
-        GameState.fullMoveNumber = int.Parse(fullMoveNumber);
+        fullMoveNumberStack.Push(int.Parse(fullMoveNumber));
 
     }
 
@@ -122,26 +134,26 @@ static class GameState
     {
         string fen = "";
 
-        fen += Piece.IsWhite(colorToMove) ? "w" : "b";
+        fen += Piece.IsWhite(ColorToMove) ? "w" : "b";
         fen += " ";
 
         string castlingRights = "";
-        if (castleSquares.Contains(6)) { castlingRights += "K"; }
-        if (castleSquares.Contains(2)) { castlingRights += "Q"; }
-        if (castleSquares.Contains(62)) { castlingRights += "k"; }
-        if (castleSquares.Contains(58)) { castlingRights += "q"; }
-        fen += castleSquares.Count == 0 ? "-" : castlingRights;
+        if (CastleSquares.Contains(6)) { castlingRights += "K"; }
+        if (CastleSquares.Contains(2)) { castlingRights += "Q"; }
+        if (CastleSquares.Contains(62)) { castlingRights += "k"; }
+        if (CastleSquares.Contains(58)) { castlingRights += "q"; }
+        fen += CastleSquares.Count == 0 ? "-" : castlingRights;
         fen += " ";
 
-        fen += vulnerableEnPassantSquare is int vulnerableSquare
+        fen += VulnerableEnPassantSquare is int vulnerableSquare
         ? Helpers.SquareToAlgebraic(vulnerableSquare)
         : "-";
 
         fen += " ";
-        fen += halfMoveClock;
+        fen += HalfMoveClock;
 
         fen += " ";
-        fen += fullMoveNumber;
+        fen += FullMoveNumber;
 
         return fen;
     }

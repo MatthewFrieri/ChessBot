@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 static class MoveOrdering
 {
@@ -21,13 +23,11 @@ static class MoveOrdering
         moves.Sort((moveA, moveB) => moveToPriority[moveB] - moveToPriority[moveA]);
     }
 
-
-
     private static int GetPriority(Move move, int depth)
     {
-
         // Assign higher priority to low value pieces capturing high value pieces
         int targetPiece = Board.PieceAt(move.TargetSquare);
+
         if (targetPiece != Piece.None)
         {
             int friendlyPiece = Board.PieceAt(move.StartSquare);
@@ -42,12 +42,16 @@ static class MoveOrdering
         // Assign higher priority to positions already in the transposition table
         if (TranspositionTable.TryLookupPosition(depth) is int evaluation)
         {
+            // Undo the pretend move
+            Board.UnRecordMove();
+            GameState.UnRecordMove();
+
             return ttBonus + evaluation;
         }
 
         // Undo the pretend move
-        Board.UnRecordMove(move);
-        GameState.UnRecordMove(move);
+        Board.UnRecordMove();
+        GameState.UnRecordMove();
 
         return 0;  // Low priority move
     }

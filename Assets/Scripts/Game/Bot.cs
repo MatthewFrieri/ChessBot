@@ -70,8 +70,8 @@ static class Bot
             }
 
             // Undo the pretend move
-            Board.UnRecordMove(move);
-            GameState.UnRecordMove(move);
+            Board.UnRecordMove();
+            GameState.UnRecordMove();
 
             // Remember the best move and evaluation
             if (evaluation > bestEvaluation)
@@ -82,13 +82,6 @@ static class Bot
 
             alpha = Math.Max(alpha, bestEvaluation);
             if (alpha >= beta) { break; }  // Prune branch
-        }
-
-
-        if (depth == 3)
-        {
-            Debug.Log(bestMove);
-            Debug.Log(bestEvaluation);
         }
 
         moveToPlay = bestMove;

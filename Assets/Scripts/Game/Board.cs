@@ -1,29 +1,33 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 static class Board
 {
-    private static int[] squares;
-
+    private static Stack<int[]> squaresStack;
 
     public static void Init(string fen)
     {
+        squaresStack = new Stack<int[]>();
         LoadFromFEN(fen);
     }
 
-
     public static int PieceAt(int square)
     {
-        return squares[square];
+        return squaresStack.Peek()[square];
     }
 
-    public static void UnRecordMove(Move move)
+    public static void UnRecordMove()
     {
-
+        squaresStack.Pop();
     }
 
+    // Board.RecordMove() must happen before GameState.RecordMove()
     public static void RecordMove(Move move)
     {
-        int friendlyColor = Piece.Color(PieceAt(move.StartSquare));
+        int[] squares = (int[])squaresStack.Peek().Clone();
+        squaresStack.Push(squares);
+
+        int friendlyColor = GameState.ColorToMove;
         squares[move.TargetSquare] = PieceAt(move.StartSquare);
         squares[move.StartSquare] = Piece.None;
 
@@ -76,7 +80,8 @@ static class Board
 
     private static void LoadFromFEN(string fen)
     {
-        squares = new int[64];
+        int[] squares = new int[64];
+        squaresStack.Push(squares);
 
         Dictionary<char, int> symbolToPiece = new Dictionary<char, int>{
             {'p', Piece.Pawn},
