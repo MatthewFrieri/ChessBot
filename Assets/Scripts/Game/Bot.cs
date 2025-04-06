@@ -53,8 +53,8 @@ static class Bot
         foreach (Move move in legalMoves)
         {
             // Pretend to make the move
-            Board.RecordMove(move);
             GameState.RecordMove(move);
+            Board.RecordMove(move);
 
             // Check transposition table for an evaluation
             int? ttEvaluation = TranspositionTable.TryLookupPosition(depth - 1);
@@ -70,8 +70,8 @@ static class Bot
             }
 
             // Undo the pretend move
-            Board.UnRecordMove();
             GameState.UnRecordMove();
+            Board.UnRecordMove();
 
             // Remember the best move and evaluation
             if (evaluation > bestEvaluation)

@@ -21,13 +21,13 @@ static class Board
         squaresStack.Pop();
     }
 
-    // Board.RecordMove() must happen before GameState.RecordMove()
+    // Board.RecordMove() must happen after GameState.RecordMove()
     public static void RecordMove(Move move)
     {
         int[] squares = (int[])squaresStack.Peek().Clone();
         squaresStack.Push(squares);
 
-        int friendlyColor = GameState.ColorToMove;
+        int friendlyColor = Piece.OppositeColor(GameState.ColorToMove);
         squares[move.TargetSquare] = PieceAt(move.StartSquare);
         squares[move.StartSquare] = Piece.None;
 

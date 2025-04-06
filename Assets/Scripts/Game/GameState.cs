@@ -54,20 +54,21 @@ static class GameState
         fullMoveNumberStack.Pop();
     }
 
+    // GameState.RecordMove() must happen before Board.RecordMove() 
     public static void RecordMove(Move move)
     {
         colorToMoveStack.Push(Piece.OppositeColor(ColorToMove));
-
-        // TODO update halfMoveClock 
-        halfMoveClockStack.Push(HalfMoveClock);
-
-        int newFullMoveNumber = ColorToMove == Piece.White ? FullMoveNumber + 1 : FullMoveNumber;
-        fullMoveNumberStack.Push(newFullMoveNumber);
 
         int? newVulnerableEnPassantSquare = move.MoveFlag == Move.Flag.PawnTwoForward
         ? (move.StartSquare < move.TargetSquare ? move.StartSquare + 8 : move.StartSquare - 8)
         : null;
         vulnerableEnPassantSquareStack.Push(newVulnerableEnPassantSquare);
+
+        int newFullMoveNumber = ColorToMove == Piece.White ? FullMoveNumber + 1 : FullMoveNumber;
+        fullMoveNumberStack.Push(newFullMoveNumber);
+
+        bool shouldResetClock = Piece.Type(Board.PieceAt(move.StartSquare)) == Piece.Pawn || Board.PieceAt(move.TargetSquare) != Piece.None;
+        halfMoveClockStack.Push(shouldResetClock ? 0 : HalfMoveClock + 1);
 
         List<int> newCastleSquares = new List<int>(CastleSquares);
         switch (move.StartSquare)

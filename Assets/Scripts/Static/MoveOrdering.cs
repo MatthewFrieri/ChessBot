@@ -36,22 +36,22 @@ static class MoveOrdering
         }
 
         // Pretend to make the move
-        Board.RecordMove(move);
         GameState.RecordMove(move);
+        Board.RecordMove(move);
 
         // Assign higher priority to positions already in the transposition table
         if (TranspositionTable.TryLookupPosition(depth) is int evaluation)
         {
             // Undo the pretend move
-            Board.UnRecordMove();
             GameState.UnRecordMove();
+            Board.UnRecordMove();
 
             return ttBonus + evaluation;
         }
 
         // Undo the pretend move
-        Board.UnRecordMove();
         GameState.UnRecordMove();
+        Board.UnRecordMove();
 
         return 0;  // Low priority move
     }

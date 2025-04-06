@@ -17,7 +17,7 @@ static class LegalMoves
     {
         List<Move> moves = new List<Move>();
 
-        for (int startSquare = 63; startSquare >= 0; startSquare--)
+        for (int startSquare = 0; startSquare < 64; startSquare++)
         {
 
             int piece = Board.PieceAt(startSquare);
@@ -59,8 +59,8 @@ static class LegalMoves
         foreach (Move move in moves)
         {
             // Pretend to make the move
-            Board.RecordMove(move);
             GameState.RecordMove(move);
+            Board.RecordMove(move);
 
             // Use the TargetSquare if the king is moving
             if (move.StartSquare == friendlyKingSquare)
@@ -77,10 +77,9 @@ static class LegalMoves
                 safeMoves.Add(move);
             }
 
-
             // Undo the pretend move
-            Board.UnRecordMove();
             GameState.UnRecordMove();
+            Board.UnRecordMove();
         }
 
         return safeMoves;

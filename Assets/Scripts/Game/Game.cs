@@ -41,8 +41,8 @@ static class Game
     {
         // RecordMove() must happen in this order
         ObjectBoard.RecordMove(move);
-        Board.RecordMove(move);
         GameState.RecordMove(move);
+        Board.RecordMove(move);
 
         if (GameState.ColorToMove == Player.Color)
         {
