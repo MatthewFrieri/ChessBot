@@ -325,7 +325,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1146255396}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8cf1a4682625cf04fb22cb1e22703ed8, type: 3}
+  m_Script: {fileID: 11500000, guid: 042d148f7e932194eb763fd8b8c1eb18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   pawnWhite: {fileID: 6082871036150555424, guid: 7f2a667daf150ed4ab89ceb830b396e0, type: 3}
