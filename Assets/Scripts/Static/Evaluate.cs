@@ -17,34 +17,34 @@ static class Evaluate
         return pieceTypeToValue[Piece.Type(piece)];
     }
 
-    public static int EvaluatePosition(Board board, GameState gameState, List<Move> legalMoves)
+    public static int EvaluatePosition(List<Move> legalMoves)
     {
         if (legalMoves.Count == 0)
         {
-            int friendlyKingSquare = LegalMoves.FindFriendlyKingSquare(board, gameState);
+            int friendlyKingSquare = LegalMoves.FindFriendlyKingSquare();
 
-            if (LegalMoves.IsSquareUnderAttack(board, friendlyKingSquare, Piece.OppositeColor(gameState.ColorToMove)))
+            if (LegalMoves.IsSquareUnderAttack(friendlyKingSquare, Piece.OppositeColor(GameState.ColorToMove)))
             {
                 return -Helpers.CheckmateEval;  // Checkmate
             }
             return 0;  // Draw
         }
 
-        int perspective = gameState.ColorToMove == Piece.White ? 1 : -1;
+        int perspective = GameState.ColorToMove == Piece.White ? 1 : -1;
 
-        int whiteValue = GetMaterialValue(board, Piece.White);
-        int blackValue = GetMaterialValue(board, Piece.Black);
+        int whiteValue = GetMaterialValue(Piece.White);
+        int blackValue = GetMaterialValue(Piece.Black);
 
         return (whiteValue - blackValue) * perspective;
     }
 
-    private static int GetMaterialValue(Board board, int color)
+    private static int GetMaterialValue(int color)
     {
         int totalValue = 0;
 
         for (int i = 0; i < 64; i++)
         {
-            int piece = board.PieceAt(i);
+            int piece = Board.PieceAt(i);
             if (Piece.Color(piece) == color)
             {
                 totalValue += Value(piece);

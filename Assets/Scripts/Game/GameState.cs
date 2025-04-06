@@ -1,50 +1,45 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public class GameState
+static class GameState
 {
-    private int colorToMove;
-    private int? vulnerableEnPassantSquare;
-    private List<int> castleSquares = new List<int>();
-    private int halfMoveClock;
-    private int fullMoveNumber;
+    private static int colorToMove;
+    private static int? vulnerableEnPassantSquare;
+    private static List<int> castleSquares = new List<int>();
+    private static int halfMoveClock;
+    private static int fullMoveNumber;
 
-    public GameState(string fen)
+    public static void Init(string fen)
     {
         LoadFromFEN(fen);
     }
 
-
-    public int ColorToMove
+    public static int ColorToMove
     {
-        get
-        {
-            return colorToMove;
-        }
+        get { return colorToMove; }
     }
 
-    public int? VulnerableEnPassantSquare
+    public static int? VulnerableEnPassantSquare
     {
-        get
-        {
-            return vulnerableEnPassantSquare;
-        }
+        get { return vulnerableEnPassantSquare; }
     }
 
-    public List<int> CastleSquares
+    public static List<int> CastleSquares
     {
-        get
-        {
-            return castleSquares;
-        }
+        get { return castleSquares; }
     }
 
-    private void ToggleColorToMove()
+    private static void ToggleColorToMove()
     {
         colorToMove = Piece.OppositeColor(colorToMove);
     }
 
-    public void RecordMove(Move move)
+    public static void UnRecordMove(Move move)
+    {
+
+    }
+
+    public static void RecordMove(Move move)
     {
         ToggleColorToMove();
 
@@ -92,7 +87,7 @@ public class GameState
 
     }
 
-    private void LoadFromFEN(string fen)
+    private static void LoadFromFEN(string fen)
     {
         string[] elements = fen.Split(" ");
 
@@ -108,7 +103,7 @@ public class GameState
         string halfMoveClock = elements[4];   // NEED TO USE
         string fullMoveNumber = elements[5];   // NEED TO USE
 
-        this.colorToMove = colorToMove == "w" ? Piece.White : Piece.Black;
+        GameState.colorToMove = colorToMove == "w" ? Piece.White : Piece.Black;
 
         if (castlingRights.Contains("K")) { castleSquares.Add(6); }
         if (castlingRights.Contains("Q")) { castleSquares.Add(2); }
@@ -117,13 +112,13 @@ public class GameState
 
         vulnerableEnPassantSquare = vulnerableEnPassantAlgebraic == "-" ? null : Helpers.AlgebraicToSquare(vulnerableEnPassantAlgebraic);
 
-        this.halfMoveClock = int.Parse(halfMoveClock);
+        GameState.halfMoveClock = int.Parse(halfMoveClock);
 
-        this.fullMoveNumber = int.Parse(fullMoveNumber);
+        GameState.fullMoveNumber = int.Parse(fullMoveNumber);
 
     }
 
-    public string HalfFen()
+    public static string HalfFen()
     {
         string fen = "";
 
@@ -150,10 +145,4 @@ public class GameState
 
         return fen;
     }
-
-    public static GameState Copy(GameState gameState)
-    {
-        return new GameState(gameState.HalfFen());
-    }
-
 }

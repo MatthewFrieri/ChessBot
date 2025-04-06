@@ -1,40 +1,36 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectBoard
+static class ObjectBoard
 {
-    private Game game;
-    private GameObject[] pieceObjects;
+    private static GameObject[] pieceObjects;
 
-    public ObjectBoard(Game game)
+    public static void Init()
     {
-        this.game = game;
         pieceObjects = new GameObject[64];
         InstantiatePieceObjects();
     }
 
-    public GameObject PieceObjectAt(int square)
+    private static GameObject PieceObjectAt(int square)
     {
         return pieceObjects[square];
     }
 
-
-    private void InstantiatePieceObjects()
+    private static void InstantiatePieceObjects()
     {
         for (int i = 0; i < 64; i++)
         {
-            int piece = game.Board.PieceAt(i);
+            int piece = Board.PieceAt(i);
 
             if (piece == Piece.None) continue;
 
-            GameObject pieceObject = game.PieceToGameObject[piece];
+            GameObject pieceObject = Game.PieceToGameObject[piece];
 
             GameObject pieceObjectClone = Object.Instantiate(pieceObject, Helpers.SquareToLocation(i), Quaternion.identity);
 
-            if (Piece.Color(piece) == game.Player.color)
+            // Only give life to the player's pieces
+            if (Piece.Color(piece) == Player.Color)
             {
-                PieceObject pieceObjectScript = pieceObjectClone.AddComponent<PieceObject>();
-                pieceObjectScript.Game = game;
+                pieceObjectClone.AddComponent<PieceObject>();
             }
 
             pieceObjects[i] = pieceObjectClone;
@@ -42,12 +38,11 @@ public class ObjectBoard
         }
     }
 
-
-
-    public void RecordMove(Move move)
+    // ObjectBoard.RecordMove() must happen before Board.RecordMove() and GameState.RecordMove()
+    public static void RecordMove(Move move)
     {
 
-        int friendlyColor = Piece.Color(game.Board.PieceAt(move.StartSquare));
+        int friendlyColor = GameState.ColorToMove;
 
         if (PieceObjectAt(move.TargetSquare) != null)
         {
@@ -60,15 +55,15 @@ public class ObjectBoard
 
         void HandlePromotion(int newPiece)
         {
-            GameObject pieceObject = game.PieceToGameObject[newPiece | friendlyColor];
+            GameObject pieceObject = Game.PieceToGameObject[newPiece | friendlyColor];
             GameObject pieceObjectClone = Object.Instantiate(pieceObject, Helpers.SquareToLocation(move.TargetSquare), Quaternion.identity);
             Object.Destroy(PieceObjectAt(move.TargetSquare));
             pieceObjects[move.TargetSquare] = pieceObjectClone;
 
-            if (friendlyColor == game.Player.color)
+            // Only give life to the player's pieces
+            if (friendlyColor == Player.Color)
             {
-                PieceObject pieceObjectScript = pieceObjectClone.AddComponent<PieceObject>();
-                pieceObjectScript.Game = game;
+                pieceObjectClone.AddComponent<PieceObject>();
             }
 
         }

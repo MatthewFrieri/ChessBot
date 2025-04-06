@@ -14,18 +14,18 @@ static class Zobrist
         RecordRandomNumbers();
     }
 
-    public static ulong GetZobristHash(Board board, GameState gameState)
+    public static ulong GetZobristHash()
     {
         ulong hash = 0;
         for (int i = 0; i < 64; i++)
         {
-            int piece = board.PieceAt(i);
+            int piece = Board.PieceAt(i);
             if (piece == Piece.None) { continue; }
             int pieceType = Piece.Type(piece);
             int colorIndex = Piece.Color(piece) == Piece.White ? 0 : 1;
             hash ^= piecesAndSquares[pieceType - 1, colorIndex, i];
         }
-        foreach (int square in gameState.CastleSquares)
+        foreach (int square in GameState.CastleSquares)
         {
             switch (square)
             {
@@ -43,11 +43,11 @@ static class Zobrist
                     break;
             }
         }
-        if (gameState.VulnerableEnPassantSquare is int vulnerableSquare)
+        if (GameState.VulnerableEnPassantSquare is int vulnerableSquare)
         {
             hash ^= enPassantFiles[Board.File(vulnerableSquare)];
         }
-        if (gameState.ColorToMove == Piece.White)
+        if (GameState.ColorToMove == Piece.White)
         {
             hash ^= whiteToMove;
         }

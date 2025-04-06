@@ -1,26 +1,26 @@
 using System.Collections.Generic;
 
-public class Player
+static class Player
 {
-    private Game game;
-    public readonly int color;
-    private List<Move> currentLegalMoves;
+    private static int color;
+    private static List<Move> currentLegalMoves;
 
-    public Player(Game game, int color)
+    public static void Init(int color)
     {
-        this.game = game;
-        this.color = color;
+        Player.color = color;
     }
 
-    public List<Move> CurrentLegalMoves
+    public static int Color
     {
-        set
-        {
-            currentLegalMoves = value;
-        }
+        get { return color; }
     }
 
-    public void MakeMove(int startSquare, int targetSquare)
+    public static List<Move> CurrentLegalMoves
+    {
+        set { currentLegalMoves = value; }
+    }
+
+    public static void MakeMove(int startSquare, int targetSquare)
     {
         // TODO Need a way of deciding how to promote
         // Right now auto promotes to queen
@@ -28,14 +28,14 @@ public class Player
         {
             if (move.StartSquare == startSquare && move.TargetSquare == targetSquare)
             {
-                game.ExecuteMove(move);
+                Game.ExecuteMove(move);
                 break;
             }
         }
 
     }
 
-    public List<int> GetLegalTargetSquares(int startSquare)
+    public static List<int> GetLegalTargetSquares(int startSquare)
     {
         List<int> targetSquares = new List<int>();
 

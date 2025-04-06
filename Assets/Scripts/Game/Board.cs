@@ -1,20 +1,27 @@
 using System.Collections.Generic;
 
-public class Board
+static class Board
 {
-    private int[] squares;
+    private static int[] squares;
 
-    public Board(string fen)
+
+    public static void Init(string fen)
     {
         LoadFromFEN(fen);
     }
 
-    public int PieceAt(int square)
+
+    public static int PieceAt(int square)
     {
         return squares[square];
     }
 
-    public void RecordMove(Move move)
+    public static void UnRecordMove(Move move)
+    {
+
+    }
+
+    public static void RecordMove(Move move)
     {
         int friendlyColor = Piece.Color(PieceAt(move.StartSquare));
         squares[move.TargetSquare] = PieceAt(move.StartSquare);
@@ -67,7 +74,7 @@ public class Board
         }
     }
 
-    private void LoadFromFEN(string fen)
+    private static void LoadFromFEN(string fen)
     {
         squares = new int[64];
 
@@ -111,7 +118,7 @@ public class Board
         }
     }
 
-    public string HalfFen()
+    public static string HalfFen()
     {
         Dictionary<int, char> pieceTypeToSymbol = new Dictionary<int, char>{
             {Piece.Pawn, 'p'},
@@ -172,10 +179,4 @@ public class Board
     {
         return square / 8;
     }
-
-    public static Board Copy(Board board)
-    {
-        return new Board(board.HalfFen());
-    }
-
 }

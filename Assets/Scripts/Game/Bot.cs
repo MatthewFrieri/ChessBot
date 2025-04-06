@@ -1,47 +1,50 @@
 using System;
 using System.Collections.Generic;
-using System.Collections;
 using UnityEngine;
 
 
-public class Bot
+static class Bot
 {
-    private Game game;
-    public int color;
-    private Move invalidMove = new Move(0, 0);
-    private Move moveToPlay;
+    private static int color;
+    private static Move invalidMove = new Move(0, 0);
+    private static Move moveToPlay;
 
-    public Bot(Game game, int color)
+    public static void Init(int color)
     {
-        this.game = game;
-        this.color = color;
+        Bot.color = color;
     }
 
-    public void MakeMove()
+    public static int Color
+    {
+        get { return color; }
+    }
+
+
+    public static void MakeMove()
     {
         int depth = 5;  // Must be at least 1
         // Can solve a mate in (depth + 1) // 2
 
-        Search(game.Board, game.GameState, depth, 0, Helpers.NegativeInfinity, Helpers.PositiveInfinity);
+        Search(depth, 0, Helpers.NegativeInfinity, Helpers.PositiveInfinity);
 
-        game.ExecuteMove(moveToPlay);
+        Game.ExecuteMove(moveToPlay);
     }
 
-    private int Search(Board board, GameState gameState, int depth, int plyFromRoot, int alpha, int beta)
+    private static int Search(int depth, int plyFromRoot, int alpha, int beta)
     {
-        List<Move> legalMoves = LegalMoves.GetLegalMoves(board, gameState);
+        List<Move> legalMoves = LegalMoves.GetLegalMoves();
 
         if (depth == 0)
         {
-            return Evaluate.EvaluatePosition(board, gameState, legalMoves);
+            return Evaluate.EvaluatePosition(legalMoves);
         }
         if (legalMoves.Count == 0)
         {
-            return Evaluate.EvaluatePosition(board, gameState, legalMoves) + plyFromRoot;  // plyFromRoot prioritizes mates that happen sooner 
+            return Evaluate.EvaluatePosition(legalMoves) + plyFromRoot;  // plyFromRoot prioritizes mates that happen sooner 
         }
 
         // Order legalMoves so that better moves are searched first. This improves alpha beta pruning
-        MoveOrdering.OrderMoves(legalMoves, board, gameState, depth - 1);
+        MoveOrdering.OrderMoves(legalMoves, depth - 1);
 
 
         int bestEvaluation = int.MinValue;
@@ -50,24 +53,25 @@ public class Bot
         foreach (Move move in legalMoves)
         {
             // Pretend to make the move
-            Board boardCopy = Board.Copy(board);
-            GameState gameStateCopy = GameState.Copy(gameState);
-            boardCopy.RecordMove(move);
-            gameStateCopy.RecordMove(move);
-
+            Board.RecordMove(move);
+            GameState.RecordMove(move);
 
             // Check transposition table for an evaluation
-            int? ttEvaluation = TranspositionTable.TryLookupPosition(boardCopy, gameStateCopy, depth - 1);
+            int? ttEvaluation = TranspositionTable.TryLookupPosition(depth - 1);
 
             int evaluation = ttEvaluation is int eval
             ? evaluation = eval
-            : -Search(boardCopy, gameStateCopy, depth - 1, plyFromRoot + 1, -beta, -alpha);
+            : -Search(depth - 1, plyFromRoot + 1, -beta, -alpha);
 
             // Update transposition table if needed
             if (ttEvaluation is null)
             {
-                TranspositionTable.StorePosition(boardCopy, gameStateCopy, evaluation, depth - 1);
+                TranspositionTable.StorePosition(evaluation, depth - 1);
             }
+
+            // Undo the pretend move
+            Board.UnRecordMove(move);
+            GameState.UnRecordMove(move);
 
             // Remember the best move and evaluation
             if (evaluation > bestEvaluation)

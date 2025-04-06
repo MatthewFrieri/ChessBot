@@ -5,10 +5,9 @@ static class TranspositionTable
 
     private static Dictionary<ulong, (int evaluation, int depth)> zobristToEval = new Dictionary<ulong, (int, int)>();
 
-    public static int? TryLookupPosition(Board board, GameState gameState, int minDepth)
+    public static int? TryLookupPosition(int minDepth)
     {
-
-        ulong key = Zobrist.GetZobristHash(board, gameState);
+        ulong key = Zobrist.GetZobristHash();
         if (zobristToEval.TryGetValue(key, out var entry))
         {
             if (entry.depth >= minDepth)
@@ -19,9 +18,9 @@ static class TranspositionTable
         return null;
     }
 
-    public static void StorePosition(Board board, GameState gameState, int evaluation, int depth)
+    public static void StorePosition(int evaluation, int depth)
     {
-        ulong key = Zobrist.GetZobristHash(board, gameState);
+        ulong key = Zobrist.GetZobristHash();
         zobristToEval[key] = (evaluation, depth);
     }
 

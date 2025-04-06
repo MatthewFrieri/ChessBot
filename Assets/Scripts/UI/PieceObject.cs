@@ -1,10 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PieceObject : MonoBehaviour
 {
-    private Game game;
 
     Vector2 startPosition;
     List<int> targetSquares;
@@ -13,13 +11,6 @@ public class PieceObject : MonoBehaviour
     GameObject moveIndicator;
     List<GameObject> activeIndicators = new List<GameObject>();
 
-    public Game Game
-    {
-        set
-        {
-            game = value;
-        }
-    }
 
     private void Awake()
     {
@@ -32,11 +23,11 @@ public class PieceObject : MonoBehaviour
     {
         startPosition = transform.position;
         int startSquare = Helpers.LocationToSquare(transform.position);
-        targetSquares = game.Player.GetLegalTargetSquares(startSquare);
+        targetSquares = Player.GetLegalTargetSquares(startSquare);
 
         foreach (int targetSquare in targetSquares)
         {
-            if (game.Board.PieceAt(targetSquare) == Piece.None)
+            if (Board.PieceAt(targetSquare) == Piece.None)
             {
                 GameObject indicator = Instantiate(moveIndicator, Helpers.SquareToLocation(targetSquare), Quaternion.identity);
                 activeIndicators.Add(indicator);
@@ -90,8 +81,7 @@ public class PieceObject : MonoBehaviour
             Vector2 targetPosition = Helpers.SquareToLocation(targetSquare);
             transform.position = targetPosition;
 
-            // Make the move
-            game.Player.MakeMove(startSquare, targetSquare);
+            Player.MakeMove(startSquare, targetSquare);
         }
         else
         {

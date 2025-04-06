@@ -1,105 +1,58 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Game
+static class Game
 {
-    private Dictionary<int, GameObject> pieceToGameObject;
+    private static Dictionary<int, GameObject> pieceToGameObject;
 
-    private Board board;
-    private ObjectBoard objectBoard;
-    private GameState gameState;
-    private Player player;
-    private Bot bot;
-
-    public Game(string fen, int botColor, Dictionary<int, GameObject> pieceToGameObject)
+    public static void Init(string fen, int botColor, Dictionary<int, GameObject> pieceToGameObject)
     {
-        this.pieceToGameObject = pieceToGameObject;
+        Game.pieceToGameObject = pieceToGameObject;
 
-        board = new Board(fen);
-        gameState = new GameState(fen);
-        player = new Player(this, Piece.OppositeColor(botColor));
-        bot = new Bot(this, botColor);
-        objectBoard = new ObjectBoard(this);
+        Board.Init(fen);
+        GameState.Init(fen);
+        ObjectBoard.Init();
+        Player.Init(Piece.OppositeColor(botColor));
+        Bot.Init(botColor);
 
-        if (gameState.ColorToMove == botColor)
+        if (GameState.ColorToMove == botColor)
         {
-            bot.MakeMove();
+            // Bot's turn
+            Bot.MakeMove();
         }
         else
         {
-            player.CurrentLegalMoves = LegalMoves.GetLegalMoves(board, gameState);
+            // Player's turn
+            Player.CurrentLegalMoves = LegalMoves.GetLegalMoves();
         }
     }
 
-    public Board Board
+    public static Dictionary<int, GameObject> PieceToGameObject
     {
-        get
-        {
-            return board;
-        }
-    }
-    public ObjectBoard ObjectBoard
-    {
-        get
-        {
-            return objectBoard;
-        }
-    }
-    public GameState GameState
-    {
-        get
-        {
-            return gameState;
-        }
-    }
-    public Player Player
-    {
-        get
-        {
-            return player;
-        }
-    }
-    public Dictionary<int, GameObject> PieceToGameObject
-    {
-        get
-        {
-            return pieceToGameObject;
-        }
+        get { return pieceToGameObject; }
     }
 
-    public string Fen()
+    public static string Fen()
     {
-        return board.HalfFen() + " " + gameState.HalfFen();
+        return Board.HalfFen() + " " + GameState.HalfFen();
     }
 
-    public void Start()
+    public static void ExecuteMove(Move move)
     {
+        // ObjectBoard.RecordMove() must happen before Board.RecordMove() and GameState.RecordMove()
+        ObjectBoard.RecordMove(move);
+        Board.RecordMove(move);
+        GameState.RecordMove(move);
 
-        // While no checkmate...
-
-        // Move move = bot.FindBestMove(board, gameState);
-        // ExecuteMove(move);
-
-        // Now player makes his move
-
-    }
-
-    public void ExecuteMove(Move move)
-    {
-
-        objectBoard.RecordMove(move);
-        board.RecordMove(move);
-        gameState.RecordMove(move);
-
-        if (gameState.ColorToMove == player.color)
+        if (GameState.ColorToMove == Player.Color)
         {
             // Now its player's turn
-            player.CurrentLegalMoves = LegalMoves.GetLegalMoves(board, gameState);
+            Player.CurrentLegalMoves = LegalMoves.GetLegalMoves();
         }
         else
         {
             // Now its bot's turn
-            bot.MakeMove();
+            Bot.MakeMove();
         }
     }
 

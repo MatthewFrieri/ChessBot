@@ -25,7 +25,6 @@ public class GameManager : MonoBehaviour
     public GameObject moveIndicator;
 
     private const string StartingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    private Game game;
 
     private void Start()
     {
@@ -42,6 +41,7 @@ public class GameManager : MonoBehaviour
         pieceToGameObject[Piece.Queen | Piece.Black] = queenBlack;
         pieceToGameObject[Piece.King | Piece.Black] = kingBlack;
 
-        game = new Game("r3kbnr/ppp1ppp1/2n4p/4P3/1qPp1Bb1/1Q1P1N2/PP1N1PPP/R3KB1R w KQkq - 0 9", Piece.Black, pieceToGameObject);
+        Game.Init("r3kbnr/ppp1ppp1/2n4p/4P3/1qPp1Bb1/1Q1P1N2/PP1N1PPP/R3KB1R w KQkq - 0 9", Piece.Black, pieceToGameObject);
+
     }
 }
