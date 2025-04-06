@@ -19,30 +19,30 @@ public class Bot
 
     public void MakeMove()
     {
-        int depth = 3;  // Must be at least 1
+        int depth = 5;  // Must be at least 1
         // Can solve a mate in (depth + 1) // 2
 
         Search(game.Board, game.GameState, depth, 0, Helpers.NegativeInfinity, Helpers.PositiveInfinity);
 
-        Debug.Log(moveToPlay);
-
         game.ExecuteMove(moveToPlay);
-
-        Debug.Log("TT size = " + TranspositionTable.Size());
     }
 
     private int Search(Board board, GameState gameState, int depth, int plyFromRoot, int alpha, int beta)
     {
         List<Move> legalMoves = LegalMoves.GetLegalMoves(board, gameState);
 
-        if (depth == 0 || legalMoves.Count == 0)
+        if (depth == 0)
         {
-            int eval = Evaluate.EvaluatePosition(board, gameState, legalMoves);
-            return eval == -Helpers.CheckmateEval ? eval + plyFromRoot : eval;  // plyFromRoot prioritizes mates that happen sooner 
+            return Evaluate.EvaluatePosition(board, gameState, legalMoves);
+        }
+        if (legalMoves.Count == 0)
+        {
+            return Evaluate.EvaluatePosition(board, gameState, legalMoves) + plyFromRoot;  // plyFromRoot prioritizes mates that happen sooner 
         }
 
         // Order legalMoves so that better moves are searched first. This improves alpha beta pruning
         MoveOrdering.OrderMoves(legalMoves, board, gameState, depth - 1);
+
 
         int bestEvaluation = int.MinValue;
         Move bestMove = invalidMove;
@@ -78,6 +78,13 @@ public class Bot
 
             alpha = Math.Max(alpha, bestEvaluation);
             if (alpha >= beta) { break; }  // Prune branch
+        }
+
+
+        if (depth == 3)
+        {
+            Debug.Log(bestMove);
+            Debug.Log(bestEvaluation);
         }
 
         moveToPlay = bestMove;

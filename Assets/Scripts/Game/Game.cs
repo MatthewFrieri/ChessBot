@@ -29,9 +29,6 @@ public class Game
         {
             player.CurrentLegalMoves = LegalMoves.GetLegalMoves(board, gameState);
         }
-
-        Debug.Log(Zobrist.GetZobristHash(board, gameState));
-
     }
 
     public Board Board

@@ -42,6 +42,6 @@ public class GameManager : MonoBehaviour
         pieceToGameObject[Piece.Queen | Piece.Black] = queenBlack;
         pieceToGameObject[Piece.King | Piece.Black] = kingBlack;
 
-        game = new Game("1kn4r/1pR1bppp/p3p3/1N2N3/3P4/P7/1P3nPP/2R3K1 w - - 0 1", Piece.White, pieceToGameObject);
+        game = new Game("r3kbnr/ppp1ppp1/2n4p/4P3/1qPp1Bb1/1Q1P1N2/PP1N1PPP/R3KB1R w KQkq - 0 9", Piece.Black, pieceToGameObject);
     }
 }

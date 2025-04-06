@@ -12,6 +12,11 @@ static class Evaluate
         { 6, 0 }
     };
 
+    public static int Value(int piece)
+    {
+        return pieceTypeToValue[Piece.Type(piece)];
+    }
+
     public static int EvaluatePosition(Board board, GameState gameState, List<Move> legalMoves)
     {
         if (legalMoves.Count == 0)
@@ -42,7 +47,7 @@ static class Evaluate
             int piece = board.PieceAt(i);
             if (Piece.Color(piece) == color)
             {
-                totalValue += pieceTypeToValue[Piece.Type(piece)];
+                totalValue += Value(piece);
             }
         }
 

@@ -17,7 +17,7 @@ static class LegalMoves
     {
         List<Move> moves = new List<Move>();
 
-        for (int startSquare = 0; startSquare < 64; startSquare++)
+        for (int startSquare = 63; startSquare >= 0; startSquare--)
         {
 
             int piece = board.PieceAt(startSquare);
