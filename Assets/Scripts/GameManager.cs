@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ public class GameManager : MonoBehaviour
     public GameObject queenBlack;
     public GameObject kingBlack;
 
-    private Dictionary<int, GameObject> pieceToGameObject = new Dictionary<int, GameObject>();
+    public Dictionary<int, GameObject> pieceToGameObject = new Dictionary<int, GameObject>();
 
     public GameObject captureIndicator;
     public GameObject moveIndicator;
@@ -41,6 +42,6 @@ public class GameManager : MonoBehaviour
         pieceToGameObject[Piece.Queen | Piece.Black] = queenBlack;
         pieceToGameObject[Piece.King | Piece.Black] = kingBlack;
 
-        game = new Game("r7/6p1/6pk/4Q1N1/6pK/5N2/8/1b6 w - - 0 1", Piece.White, pieceToGameObject);
+        game = new Game("1kn4r/1pR1bppp/p3p3/1N2N3/3P4/P7/1P3nPP/2R3K1 w - - 0 1", Piece.White, pieceToGameObject);
     }
 }

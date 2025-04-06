@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 
@@ -28,7 +29,6 @@ public class Bot
         game.ExecuteMove(moveToPlay);
 
         Debug.Log("TT size = " + TranspositionTable.Size());
-
     }
 
     private int Search(Board board, GameState gameState, int depth, int plyFromRoot, int alpha, int beta)
@@ -40,6 +40,9 @@ public class Bot
             int eval = Evaluate.EvaluatePosition(board, gameState, legalMoves);
             return eval == -Helpers.CheckmateEval ? eval + plyFromRoot : eval;  // plyFromRoot prioritizes mates that happen sooner 
         }
+
+        // Order legalMoves so that better moves are searched first. This improves alpha beta pruning
+        MoveOrdering.OrderMoves(legalMoves, board, gameState, depth - 1);
 
         int bestEvaluation = int.MinValue;
         Move bestMove = invalidMove;
