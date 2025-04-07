@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -97,59 +98,116 @@ static class LegalMoves
         return -1;  // This line will never get reached
     }
 
-    public static bool IsSquareUnderAttack(int square, int enemyColor)
+    public static List<int> SquaresThatSquareIsTargettedBy(int square, int piece)
     {
         int[] knightOffsets = { -10, -17, -15, -6, 10, 17, 15, 6 };
-        int[] pawnOffsets = enemyColor == Piece.White ? new int[] { -7, -9 } : new int[] { 7, 9 };
+        int[] pawnOffsets = Piece.Color(piece) == Piece.White ? new int[] { -7, -9 } : new int[] { 7, 9 };
         int[] kingOffsets = { 1, 7, 8, 9, -1, -7, -8, -9 };
         int[] rookDirs = { 1, 8, -1, -8 };
         int[] bishopDirs = { 7, 9, -7, -9 };
 
-        foreach (int offset in knightOffsets)
+        List<int> DoRook()
         {
-            int targetSquare = square + offset;
-            if (targetSquare < 0 || targetSquare >= 64) continue;  // Stops going off the top and bottom of the board
-            if (Math.Abs(Board.File(square) - Board.File(targetSquare)) > 2) continue;  // Stops going off the sides of the board 
-            if (Board.PieceAt(targetSquare) == (Piece.Knight | enemyColor)) { return true; }
-        }
-        foreach (int offset in pawnOffsets)
-        {
-            int targetSquare = square + offset;
-            if (targetSquare < 0 || targetSquare >= 64) continue;  // Stops going off the top and bottom of the board
-            if (Math.Abs(Board.File(square) - Board.File(targetSquare)) > 1) continue;  // Stops going off the sides of the board 
-            if (Board.PieceAt(targetSquare) == (Piece.Pawn | enemyColor)) { return true; }
-        }
-        foreach (int offset in kingOffsets)
-        {
-            int targetSquare = square + offset;
-            if (targetSquare < 0 || targetSquare >= 64) continue;  // Stops going off the top and bottom of the board
-            if (Math.Abs(Board.File(square) - Board.File(targetSquare)) > 1) continue;  // Stops going off the sides of the board 
-            if (Board.PieceAt(targetSquare) == (Piece.King | enemyColor)) { return true; }
-        }
-        foreach (int dir in rookDirs)
-        {
-            for (int i = 1; i < 8; i++)
+            List<int> result = new List<int>();
+            foreach (int dir in rookDirs)
             {
-                int targetSquare = square + dir * i;
-                if (targetSquare < 0 || targetSquare >= 64) break;  // Stops going off the top and bottom of the board
-                if (Math.Abs(dir) == 1 && Board.Rank(square) != Board.Rank(targetSquare)) break;  // Stops from going accross sides of the board
-                int targetPiece = Board.PieceAt(targetSquare);
-                if (targetPiece == (Piece.Rook | enemyColor) || targetPiece == (Piece.Queen | enemyColor)) { return true; }
-                if (targetPiece != Piece.None) break;  // Stop this direction if a piece is hit
+                for (int i = 1; i < 8; i++)
+                {
+                    int targetSquare = square + dir * i;
+                    if (targetSquare < 0 || targetSquare >= 64) break;  // Stops going off the top and bottom of the board
+                    if (Math.Abs(dir) == 1 && Board.Rank(square) != Board.Rank(targetSquare)) break;  // Stops from going accross sides of the board
+                    int targetPiece = Board.PieceAt(targetSquare);
+                    if (targetPiece == piece) { result.Add(targetSquare); }
+                    if (targetPiece != Piece.None) break;  // Stop this direction if a piece is hit
+                }
+            }
+            return result;
+        }
+
+        List<int> DoBishop()
+        {
+            List<int> result = new List<int>();
+            foreach (int dir in bishopDirs)
+            {
+                for (int i = 1; i < 8; i++)
+                {
+                    int targetSquare = square + dir * i;
+                    if (targetSquare < 0 || targetSquare >= 64) break;  // Stops going off the top and bottom of the board
+                    if (Math.Abs(Board.Rank(square) - Board.Rank(targetSquare)) != i) break;  // Stops from going accross sides of the board
+                    int targetPiece = Board.PieceAt(targetSquare);
+                    if (targetPiece == piece) { result.Add(targetSquare); }
+                    if (targetPiece != Piece.None) break;  // Stop this direction if a piece is hit
+                }
+            }
+            return result;
+        }
+
+
+        List<int> result = new List<int>();
+        switch (Piece.Type(piece))
+        {
+            case Piece.Knight:
+                foreach (int offset in knightOffsets)
+                {
+                    int targetSquare = square + offset;
+                    if (targetSquare < 0 || targetSquare >= 64) continue;  // Stops going off the top and bottom of the board
+                    if (Math.Abs(Board.File(square) - Board.File(targetSquare)) > 2) continue;  // Stops going off the sides of the board 
+                    if (Board.PieceAt(targetSquare) == piece) { result.Add(targetSquare); }
+                }
+                break;
+
+            case Piece.Pawn:
+                foreach (int offset in pawnOffsets)
+                {
+                    int targetSquare = square + offset;
+                    if (targetSquare < 0 || targetSquare >= 64) continue;  // Stops going off the top and bottom of the board
+                    if (Math.Abs(Board.File(square) - Board.File(targetSquare)) > 1) continue;  // Stops going off the sides of the board 
+                    if (Board.PieceAt(targetSquare) == piece) { result.Add(targetSquare); }
+                }
+                break;
+
+            case Piece.King:
+                foreach (int offset in kingOffsets)
+                {
+                    int targetSquare = square + offset;
+                    if (targetSquare < 0 || targetSquare >= 64) continue;  // Stops going off the top and bottom of the board
+                    if (Math.Abs(Board.File(square) - Board.File(targetSquare)) > 1) continue;  // Stops going off the sides of the board 
+                    if (Board.PieceAt(targetSquare) == piece) { result.Add(targetSquare); }
+                }
+                break;
+
+            case Piece.Rook:
+                return DoRook();
+
+            case Piece.Bishop:
+                return DoBishop();
+
+            case Piece.Queen:
+                return DoRook().Concat(DoBishop()).ToList();
+        }
+
+        return result;
+    }
+
+    public static bool IsSquareUnderAttack(int square, int enemyColor)
+    {
+        List<int> pieces = new List<int> {
+            Piece.Pawn | enemyColor,
+            Piece.Knight | enemyColor,
+            Piece.Bishop | enemyColor,
+            Piece.Rook | enemyColor,
+            Piece.Queen | enemyColor,
+            Piece.King | enemyColor,
+        };
+
+        foreach (int piece in pieces)
+        {
+            if (SquaresThatSquareIsTargettedBy(square, piece).Count != 0)
+            {
+                return true;
             }
         }
-        foreach (int dir in bishopDirs)
-        {
-            for (int i = 1; i < 8; i++)
-            {
-                int targetSquare = square + dir * i;
-                if (targetSquare < 0 || targetSquare >= 64) break;  // Stops going off the top and bottom of the board
-                if (Math.Abs(Board.Rank(square) - Board.Rank(targetSquare)) != i) break;  // Stops from going accross sides of the board
-                int targetPiece = Board.PieceAt(targetSquare);
-                if (targetPiece == (Piece.Bishop | enemyColor) || targetPiece == (Piece.Queen | enemyColor)) { return true; }
-                if (targetPiece != Piece.None) break;  // Stop this direction if a piece is hit
-            }
-        }
+
         return false;
     }
 

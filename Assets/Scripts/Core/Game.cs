@@ -39,10 +39,16 @@ static class Game
 
     public static void ExecuteMove(Move move)
     {
-        // RecordMove() must happen in this order
+
+        // These all must happen in this order
         ObjectBoard.RecordMove(move);
         GameState.RecordMove(move);
+        GameState.UpdatePgn(move);  // Only needs to happen once when we decide to execute
         Board.RecordMove(move);
+
+
+        Debug.Log(string.Join(" ", GameState.Pgn));
+
 
         if (GameState.ColorToMove == Player.Color)
         {
@@ -55,6 +61,4 @@ static class Game
             Bot.MakeMove();
         }
     }
-
-
 }

@@ -83,7 +83,7 @@ static class Board
         int[] squares = new int[64];
         squaresStack.Push(squares);
 
-        Dictionary<char, int> symbolToPiece = new Dictionary<char, int>{
+        Dictionary<char, int> symbolToPieceType = new Dictionary<char, int>{
             {'p', Piece.Pawn},
             {'r', Piece.Rook},
             {'n', Piece.Knight},
@@ -113,7 +113,7 @@ static class Board
             }
 
 
-            int pieceType = symbolToPiece[char.ToLower(symbol)];
+            int pieceType = symbolToPieceType[char.ToLower(symbol)];
             int pieceColor = char.IsUpper(symbol) ? Piece.White : Piece.Black;
             int piece = pieceType | pieceColor;
 

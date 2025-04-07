@@ -6,7 +6,7 @@ static class Helpers
     public static string SquareToAlgebraic(int square)
     {
         string file = ((char)('a' + Board.File(square))).ToString();
-        string rank = Board.Rank(square).ToString();
+        string rank = (Board.Rank(square) + 1).ToString();
 
         return file + rank;
     }
@@ -14,7 +14,7 @@ static class Helpers
     public static int AlgebraicToSquare(string algebraic)
     {
         int file = algebraic[0] - 'a';
-        int rank = algebraic[1];
+        int rank = (int)char.GetNumericValue(algebraic[1]) - 1;
 
         return 8 * rank + file;
     }

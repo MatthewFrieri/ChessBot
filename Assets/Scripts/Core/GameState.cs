@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
+using UnityEngine;
 
 static class GameState
 {
@@ -9,6 +9,18 @@ static class GameState
     private static Stack<List<int>> castleSquaresStack;
     private static Stack<int> halfMoveClockStack;
     private static Stack<int> fullMoveNumberStack;
+    private static Stack<List<string>> pgnStack;
+
+    private static Dictionary<int, string> pieceTypeToSymbol = new Dictionary<int, string>
+    {
+        {Piece.Pawn, ""},
+        {Piece.Rook, "R"},
+        {Piece.Knight, "N"},
+        {Piece.Bishop, "B"},
+        {Piece.Queen, "Q"},
+        {Piece.King, "K"}
+    };
+
 
     public static void Init(string fen)
     {
@@ -17,6 +29,7 @@ static class GameState
         castleSquaresStack = new Stack<List<int>>();
         halfMoveClockStack = new Stack<int>();
         fullMoveNumberStack = new Stack<int>();
+        pgnStack = new Stack<List<string>>();
         LoadFromFEN(fen);
     }
 
@@ -45,6 +58,18 @@ static class GameState
         get { return fullMoveNumberStack.Peek(); }
     }
 
+    public static List<string> Pgn
+    {
+        get { return pgnStack.Peek(); }
+    }
+
+    public static void UpdatePgn(Move move)
+    {
+        List<string> newPgn = new List<string>(Pgn);
+        newPgn.Add(GetMoveAlgebraic(move));
+        pgnStack.Push(newPgn);
+    }
+
     public static void UnRecordMove()
     {
         colorToMoveStack.Pop();
@@ -63,12 +88,6 @@ static class GameState
         ? (move.StartSquare < move.TargetSquare ? move.StartSquare + 8 : move.StartSquare - 8)
         : null;
         vulnerableEnPassantSquareStack.Push(newVulnerableEnPassantSquare);
-
-        int newFullMoveNumber = ColorToMove == Piece.White ? FullMoveNumber + 1 : FullMoveNumber;
-        fullMoveNumberStack.Push(newFullMoveNumber);
-
-        bool shouldResetClock = Piece.Type(Board.PieceAt(move.StartSquare)) == Piece.Pawn || Board.PieceAt(move.TargetSquare) != Piece.None;
-        halfMoveClockStack.Push(shouldResetClock ? 0 : HalfMoveClock + 1);
 
         List<int> newCastleSquares = new List<int>(CastleSquares);
         switch (move.StartSquare)
@@ -96,7 +115,91 @@ static class GameState
         }
         castleSquaresStack.Push(newCastleSquares);
 
+        int newFullMoveNumber = ColorToMove == Piece.White ? FullMoveNumber + 1 : FullMoveNumber;
+        fullMoveNumberStack.Push(newFullMoveNumber);
+
+        bool shouldResetClock = Piece.Type(Board.PieceAt(move.StartSquare)) == Piece.Pawn || Board.PieceAt(move.TargetSquare) != Piece.None;
+        halfMoveClockStack.Push(shouldResetClock ? 0 : HalfMoveClock + 1);
     }
+
+    private static string GetMoveAlgebraic(Move move)
+    {
+
+        Debug.Log("Get algebraic for: " + move);
+        // Castling
+        if (move.MoveFlag == Move.Flag.Castling)
+        {
+            switch (Board.File(move.TargetSquare))
+            {
+                case 2:
+                    return "O-O-O";
+                case 6:
+                    return "O-O";
+            }
+        }
+
+        // Check
+        Board.RecordMove(move);  // Pretend to make the move. * This is okay because GameState.RecordMove() essentially already happened *
+        int enemyKingSquare = LegalMoves.FindFriendlyKingSquare();
+        string checkSymbol = LegalMoves.IsSquareUnderAttack(enemyKingSquare, Piece.OppositeColor(ColorToMove)) ? "+" : "";
+        Board.UnRecordMove();   // Undo the pretend move
+
+        // Target square
+        string targetSquareAlgebraic = Helpers.SquareToAlgebraic(move.TargetSquare);
+
+        // Friendly piece
+        int friendlyPiece = Board.PieceAt(move.StartSquare);
+        int friendlyPieceType = Piece.Type(friendlyPiece);
+        string friendlyPieceSymbol = pieceTypeToSymbol[friendlyPieceType];
+
+        // Capture
+        bool isCapture = Board.PieceAt(move.TargetSquare) != Piece.None || move.MoveFlag == Move.Flag.EnPassantCapture;
+        string captureSymbol = isCapture ? "x" : "";
+
+        // Pawn file when capturing
+        string startSquareAlgebraic = Helpers.SquareToAlgebraic(move.StartSquare);
+        string pawnFileSymbol = isCapture && friendlyPieceType == Piece.Pawn ? startSquareAlgebraic.Substring(0, 1) : "";
+
+        // Promotion
+        string promotionSymbol = "";
+        switch (move.MoveFlag)
+        {
+            case Move.Flag.PromoteToQueen:
+                promotionSymbol += "=Q";
+                break;
+            case Move.Flag.PromoteToRook:
+                promotionSymbol += "=R";
+                break;
+            case Move.Flag.PromoteToBishop:
+                promotionSymbol += "=B";
+                break;
+            case Move.Flag.PromoteToKnight:
+                promotionSymbol += "=N";
+                break;
+        }
+
+        // Differentiator for when two identical non-pawns can move to the same square 
+        string differentiator = "";
+        if (friendlyPieceType != Piece.Pawn)
+        {
+            List<int> similarSquares = LegalMoves.SquaresThatSquareIsTargettedBy(move.TargetSquare, friendlyPiece);
+            bool similarRank = false;
+            bool similarFile = false;
+            foreach (int square in similarSquares)
+            {
+                if (square == move.StartSquare) { continue; }
+                if (Board.File(square) == Board.File(move.StartSquare)) { similarFile = true; }
+                if (Board.Rank(square) == Board.Rank(move.StartSquare)) { similarRank = true; }
+                Debug.Log(square);
+            }
+            Debug.Log(startSquareAlgebraic);
+            if (similarRank) { differentiator += startSquareAlgebraic.Substring(0, 1); }
+            if (similarFile) { differentiator += startSquareAlgebraic.Substring(1, 1); }
+        }
+
+        return friendlyPieceSymbol + differentiator + pawnFileSymbol + captureSymbol + targetSquareAlgebraic + promotionSymbol + checkSymbol;
+    }
+
 
     private static void LoadFromFEN(string fen)
     {
@@ -128,6 +231,8 @@ static class GameState
         halfMoveClockStack.Push(int.Parse(halfMoveClock));
 
         fullMoveNumberStack.Push(int.Parse(fullMoveNumber));
+
+        pgnStack.Push(new List<string>());
 
     }
 
