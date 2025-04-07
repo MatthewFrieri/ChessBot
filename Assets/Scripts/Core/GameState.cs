@@ -125,7 +125,6 @@ static class GameState
     private static string GetMoveAlgebraic(Move move)
     {
 
-        Debug.Log("Get algebraic for: " + move);
         // Castling
         if (move.MoveFlag == Move.Flag.Castling)
         {
@@ -183,18 +182,21 @@ static class GameState
         if (friendlyPieceType != Piece.Pawn)
         {
             List<int> similarSquares = LegalMoves.SquaresThatSquareIsTargettedBy(move.TargetSquare, friendlyPiece);
-            bool similarRank = false;
-            bool similarFile = false;
+            bool identifyFile = false;
+            bool identifyRank = false;
             foreach (int square in similarSquares)
             {
                 if (square == move.StartSquare) { continue; }
-                if (Board.File(square) == Board.File(move.StartSquare)) { similarFile = true; }
-                if (Board.Rank(square) == Board.Rank(move.StartSquare)) { similarRank = true; }
-                Debug.Log(square);
+                if (Board.File(square) == Board.File(move.StartSquare)) { identifyRank = true; continue; }
+                if (Board.Rank(square) == Board.Rank(move.StartSquare)) { identifyFile = true; continue; }
+                if (Board.File(square) != Board.File(move.StartSquare) && Board.Rank(square) != Board.Rank(move.StartSquare))
+                {
+                    identifyFile = true;
+                    identifyRank = true;
+                }
             }
-            Debug.Log(startSquareAlgebraic);
-            if (similarRank) { differentiator += startSquareAlgebraic.Substring(0, 1); }
-            if (similarFile) { differentiator += startSquareAlgebraic.Substring(1, 1); }
+            if (identifyFile) { differentiator += startSquareAlgebraic.Substring(0, 1); }
+            if (identifyRank) { differentiator += startSquareAlgebraic.Substring(1, 1); }
         }
 
         return friendlyPieceSymbol + differentiator + pawnFileSymbol + captureSymbol + targetSquareAlgebraic + promotionSymbol + checkSymbol;
