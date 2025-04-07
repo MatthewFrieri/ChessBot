@@ -46,9 +46,7 @@ static class Game
         GameState.UpdatePgn(move);  // Only needs to happen once when we decide to execute
         Board.RecordMove(move);
 
-
-        Debug.Log(string.Join(" ", GameState.Pgn));
-
+        Debug.Log("PGN: " + string.Join(" ", GameState.Pgn));
 
         if (GameState.ColorToMove == Player.Color)
         {

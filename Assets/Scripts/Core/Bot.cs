@@ -25,7 +25,7 @@ static class Bot
 
     public static void MakeMove()
     {
-        int depth = 3;  // Must be at least 1
+        int depth = 5;  // Must be at least 1
         // Can solve a mate in (depth + 1) // 2
 
         Search.RecursiveSearch(depth, 0, NegativeInfinity, PositiveInfinity);

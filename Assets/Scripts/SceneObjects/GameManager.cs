@@ -41,6 +41,6 @@ public class GameManager : MonoBehaviour
         pieceToGameObject[Piece.Queen | Piece.Black] = queenBlack;
         pieceToGameObject[Piece.King | Piece.Black] = kingBlack;
 
-        Game.Init("7k/8/8/N3N3/8/4N3/8/5K2 w - - 0 1", Piece.Black, pieceToGameObject);
+        Game.Init(StartingFen, Piece.Black, pieceToGameObject);
     }
 }
