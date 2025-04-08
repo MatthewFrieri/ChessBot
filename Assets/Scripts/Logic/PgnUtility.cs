@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 static class PgnUtility
@@ -67,8 +69,6 @@ static class PgnUtility
         int friendlyPiece = friendlyPieceType | GameState.ColorToMove;
 
 
-        int startSquare = -1;  // Will get overwritten
-
         // Find the start square
         List<int> startSquareOptions = new List<int>();
         if (friendlyPieceType == Piece.Pawn && !algebraic.Contains('x'))  // Consider pawns that move forward seperately because they dont "target" the target square
@@ -93,38 +93,47 @@ static class PgnUtility
             startSquareOptions = LegalMoves.SquaresThatSquareIsTargettedBy(targetSquare, friendlyPiece);
         }
 
+
+        int startSquare = -1;  // Will get overwritten
+
+
+        // Find start square
         if (startSquareOptions.Count == 1)
         {
-            return new Move(startSquareOptions[0], targetSquare);
+            startSquare = startSquareOptions[0];
         }
-
-        List<char> differentiators = new List<char>();
-        for (int i = 0; i < lastDigitIndex - 1; i++)
+        else
         {
-            char c = algebraic[i];
-            if (char.IsUpper(c)) { continue; }
-            if (c == 'x') { break; }
-            differentiators.Add(c);
-        }
-
-        if (differentiators.Count == 2)  // Exact startSquare is known
-        {
-            startSquare = Helpers.AlgebraicToSquare(string.Join("", differentiators));
-        }
-
-        char differentiator = differentiators[0];  // At this point differentiator.Count == 1
-        if (char.IsLetter(differentiator))  // File is known
-        {
-            foreach (int square in startSquareOptions)
+            List<char> differentiators = new List<char>();
+            for (int i = 0; i < lastDigitIndex - 1; i++)
             {
-                if (Helpers.SquareToAlgebraic(square)[0] == differentiator) { startSquare = square; break; }
+                char c = algebraic[i];
+                if (char.IsUpper(c)) { continue; }
+                if (c == 'x') { break; }
+                differentiators.Add(c);
             }
-        }
-        else  // Rank is known
-        {
-            foreach (int square in startSquareOptions)
+
+            if (differentiators.Count == 2)  // Exact startSquare is known
             {
-                if (Board.Rank(square) == char.GetNumericValue(differentiator)) { startSquare = square; break; }
+                startSquare = Helpers.AlgebraicToSquare(string.Join("", differentiators));
+            }
+            else  // At this point differentiator.Count == 1
+            {
+                char differentiator = differentiators[0];
+                if (char.IsLetter(differentiator))  // File is known
+                {
+                    foreach (int square in startSquareOptions)
+                    {
+                        if (Helpers.SquareToAlgebraic(square)[0] == differentiator) { startSquare = square; break; }
+                    }
+                }
+                else  // Rank is known
+                {
+                    foreach (int square in startSquareOptions)
+                    {
+                        if (Board.Rank(square) == char.GetNumericValue(differentiator)) { startSquare = square; break; }
+                    }
+                }
             }
         }
 
