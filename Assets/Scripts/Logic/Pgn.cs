@@ -117,7 +117,7 @@ static class PgnUtility
         {
             foreach (int square in startSquareOptions)
             {
-                if (Board.File(square) == differentiator) { startSquare = square; break; }
+                if (Helpers.SquareToAlgebraic(square)[0] == differentiator) { startSquare = square; break; }
             }
         }
         else  // Rank is known

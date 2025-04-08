@@ -9,7 +9,7 @@ static class Opening
     private const string path = "Assets/Games.txt";
     private static List<string> matchingLines;
 
-    private static System.Random random = new System.Random();
+    private static System.Random random = new System.Random(5334);
 
 
     static Opening()
