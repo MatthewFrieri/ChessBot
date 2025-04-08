@@ -4,8 +4,6 @@ using System.Collections.Generic;
 static class Search
 {
 
-    private static Move invalidMove = new Move(0, 0);
-
     public static int RecursiveSearch(int depth, int plyFromRoot, int alpha, int beta)
     {
         List<Move> legalMoves = LegalMoves.GetLegalMoves();
@@ -24,7 +22,7 @@ static class Search
 
 
         int bestEvaluation = int.MinValue;
-        Move bestMove = invalidMove;
+        Move bestMove = Move.InvalidMove;
 
         foreach (Move move in legalMoves)
         {

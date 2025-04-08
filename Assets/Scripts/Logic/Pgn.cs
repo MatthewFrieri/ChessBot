@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 static class PgnUtility
 {
@@ -11,10 +13,145 @@ static class PgnUtility
         {Piece.Queen, "Q"},
         {Piece.King, "K"}
     };
+    private static Dictionary<char, int> symbolToPieceType = new Dictionary<char, int>
+    {
+        {'R', Piece.Rook},
+        {'N', Piece.Knight},
+        {'B', Piece.Bishop},
+        {'Q', Piece.Queen},
+        {'K', Piece.King}
+    };
+    private static Dictionary<char, int> symbolToPromotionFlag = new Dictionary<char, int>
+    {
+        {'R', Move.Flag.PromoteToRook},
+        {'N', Move.Flag.PromoteToKnight},
+        {'B', Move.Flag.PromoteToBishop},
+        {'Q', Move.Flag.PromoteToQueen},
+    };
 
     public static Move AlgebraicToMove(string algebraic)
     {
-        return new Move(0, 0);
+        // Castling
+        if (algebraic[0] == 'O')
+        {
+            int castleStartSquare = GameState.ColorToMove == Piece.White ? 4 : 60;
+            int castleTargetSquare;
+
+            if (algebraic == "O-O")  // King side castle
+            {
+                castleTargetSquare = GameState.ColorToMove == Piece.White ? 6 : 62;
+            }
+            else  // Queen side castle
+            {
+                castleTargetSquare = GameState.ColorToMove == Piece.White ? 2 : 58;
+            }
+
+            return new Move(castleStartSquare, castleTargetSquare, Move.Flag.Castling);
+        }
+
+        // Find the target square
+        int lastDigitIndex = -1;  // Will get assigned
+        for (int i = 0; i < algebraic.Length; i++)
+        {
+            if (char.IsDigit(algebraic[i]))
+            {
+                lastDigitIndex = i;
+            }
+        }
+        string targetAlgebraic = algebraic.Substring(lastDigitIndex - 1, 2);
+        int targetSquare = Helpers.AlgebraicToSquare(targetAlgebraic);
+
+        // Find the friendly piece
+        char pieceSymbol = algebraic[0];
+        int friendlyPieceType = char.IsUpper(pieceSymbol) ? symbolToPieceType[pieceSymbol] : Piece.Pawn;
+        int friendlyPiece = friendlyPieceType | GameState.ColorToMove;
+
+
+        int startSquare = -1;  // Will get overwritten
+
+        // Find the start square
+        List<int> startSquareOptions = new List<int>();
+        if (friendlyPieceType == Piece.Pawn && !algebraic.Contains('x'))  // Consider pawns that move forward seperately because they dont "target" the target square
+        {
+            int dir = GameState.ColorToMove == Piece.White ? -1 : 1;
+
+            int backOneSquare = targetSquare + dir * 8;
+            int backTwoSquare = targetSquare + dir * 16;
+            int backTwoRank = (int)(3.5 + dir * 2.5);
+
+            if (Board.PieceAt(backOneSquare) == friendlyPiece)
+            {
+                startSquareOptions.Add(backOneSquare);
+            }
+            else if (Board.PieceAt(backTwoSquare) == friendlyPiece && Board.Rank(backTwoSquare) == backTwoRank && Board.PieceAt(backOneSquare) == Piece.None)
+            {
+                startSquareOptions.Add(backTwoSquare);
+            }
+        }
+        else
+        {
+            startSquareOptions = LegalMoves.SquaresThatSquareIsTargettedBy(targetSquare, friendlyPiece);
+        }
+
+        if (startSquareOptions.Count == 1)
+        {
+            return new Move(startSquareOptions[0], targetSquare);
+        }
+
+        List<char> differentiators = new List<char>();
+        for (int i = 0; i < lastDigitIndex - 1; i++)
+        {
+            char c = algebraic[i];
+            if (char.IsUpper(c)) { continue; }
+            if (c == 'x') { break; }
+            differentiators.Add(c);
+        }
+
+        if (differentiators.Count == 2)  // Exact startSquare is known
+        {
+            startSquare = Helpers.AlgebraicToSquare(string.Join("", differentiators));
+        }
+
+        char differentiator = differentiators[0];  // At this point differentiator.Count == 1
+        if (char.IsLetter(differentiator))  // File is known
+        {
+            foreach (int square in startSquareOptions)
+            {
+                if (Board.File(square) == differentiator) { startSquare = square; break; }
+            }
+        }
+        else  // Rank is known
+        {
+            foreach (int square in startSquareOptions)
+            {
+                if (Board.Rank(square) == char.GetNumericValue(differentiator)) { startSquare = square; break; }
+            }
+        }
+
+        // Find flag
+        int flag = Move.Flag.None;
+
+        int equalSignIndex = algebraic.IndexOf('=');
+        if (equalSignIndex != -1)  // Promotion
+        {
+            char promotionSymbol = algebraic[equalSignIndex + 1];
+            flag = symbolToPromotionFlag[promotionSymbol];
+        }
+
+        if (friendlyPieceType == Piece.Pawn)
+        {
+            if (Math.Abs(Board.Rank(startSquare) - Board.Rank(targetSquare)) > 1)  // Pawn pushed two
+            {
+                flag = Move.Flag.PawnTwoForward;
+            }
+
+            if (targetSquare == GameState.VulnerableEnPassantSquare)  // En passant capture
+            {
+                flag = Move.Flag.EnPassantCapture;
+            }
+        }
+
+        return new Move(startSquare, targetSquare, flag);
     }
 
     public static string MoveToAlgebraic(Move move)

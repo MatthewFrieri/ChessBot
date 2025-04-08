@@ -52,8 +52,20 @@ public readonly struct Move
         }
     }
 
+    public static Move InvalidMove
+    {
+        get
+        {
+            return new Move(0, 0);
+        }
+    }
+
     public override string ToString()
     {
+        if (moveValue == 0)
+        {
+            return "! Invalid Move !";
+        }
         if (MoveFlag == Flag.None)
         {
             return $"Move: StartSquare={StartSquare}, TargetSquare={TargetSquare}";
