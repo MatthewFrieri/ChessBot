@@ -1,7 +1,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using System;
 
 static class Opening
 {
@@ -9,7 +9,7 @@ static class Opening
     private const string path = "Assets/Games.txt";
     private static List<string> matchingLines;
 
-    private static System.Random random = new System.Random(5334);
+    private static Random random = new Random();
 
 
     static Opening()

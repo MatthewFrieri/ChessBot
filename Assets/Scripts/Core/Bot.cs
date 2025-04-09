@@ -71,7 +71,7 @@ static class Bot
         }
 
 
-        depth = 5;  // Must be at least 1
+        depth = 3;  // Must be at least 1
         // Can solve a mate in (depth + 1) // 2
 
         Search.RecursiveSearch(depth, 0, NegativeInfinity, PositiveInfinity);
