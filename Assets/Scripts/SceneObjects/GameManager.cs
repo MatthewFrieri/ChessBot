@@ -24,10 +24,19 @@ public class GameManager : MonoBehaviour
     public GameObject captureIndicator;
     public GameObject moveIndicator;
 
+    private AudioSource audioSource;
+    public AudioClip moveAudioClip;
+    public AudioClip captureAudioClip;
+    public AudioClip checkAudioClip;
+
+
     private const string StartingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     private void Start()
     {
+
+        audioSource = GetComponent<AudioSource>();
+
         pieceToGameObject[Piece.Pawn | Piece.White] = pawnWhite;
         pieceToGameObject[Piece.Rook | Piece.White] = rookWhite;
         pieceToGameObject[Piece.Knight | Piece.White] = knightWhite;
@@ -42,5 +51,22 @@ public class GameManager : MonoBehaviour
         pieceToGameObject[Piece.King | Piece.Black] = kingBlack;
 
         Game.Init(StartingFen, Piece.Black, pieceToGameObject);
+    }
+
+
+    public void PlayMoveSound()
+    {
+        audioSource.clip = moveAudioClip;
+        audioSource.Play();
+    }
+    public void PlayCaptureSound()
+    {
+        audioSource.clip = captureAudioClip;
+        audioSource.Play();
+    }
+    public void PlayCheckSound()
+    {
+        audioSource.clip = checkAudioClip;
+        audioSource.Play();
     }
 }

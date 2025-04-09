@@ -1,14 +1,17 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 static class Game
 {
     private static Dictionary<int, GameObject> pieceToGameObject;
+    private static GameManager gameManager;
     private static BotManager botManager;
 
     public static void Init(string fen, int botColor, Dictionary<int, GameObject> pieceToGameObject)
     {
         Game.pieceToGameObject = pieceToGameObject;
+        gameManager = Object.FindObjectOfType<GameManager>();
         botManager = Object.FindObjectOfType<BotManager>();
 
         Board.Init(fen);
@@ -48,6 +51,8 @@ static class Game
         GameState.UpdatePgn(move);  // Only needs to happen once when we decide to execute
         Board.RecordMove(move);
 
+        PlayCorrectSound();
+
         Debug.Log("PGN: " + string.Join(" ", GameState.Pgn));
 
         if (GameState.ColorToMove == Player.Color)
@@ -59,6 +64,24 @@ static class Game
         {
             // Now its bot's turn
             botManager.StartBotTurn();
+        }
+    }
+
+    private static void PlayCorrectSound()
+    {
+        string algebraic = GameState.Pgn.Last();
+
+        if (algebraic.Contains("+"))
+        {
+            gameManager.PlayCheckSound();
+        }
+        else if (algebraic.Contains("x"))
+        {
+            gameManager.PlayCaptureSound();
+        }
+        else
+        {
+            gameManager.PlayMoveSound();
         }
     }
 }
