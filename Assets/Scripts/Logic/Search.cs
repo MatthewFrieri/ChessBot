@@ -59,6 +59,9 @@ static class Search
         }
 
         Bot.MoveToPlay = bestMove;
+        Bot.MoveToPlayEval = bestEvaluation;
+        Bot.MoveToPlayAlgebraic = PgnUtility.MoveToAlgebraic(bestMove);
+
         return bestEvaluation;
     }
 }

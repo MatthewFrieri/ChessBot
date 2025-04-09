@@ -4,6 +4,9 @@ static class Bot
 {
     private static int color;
     private static Move moveToPlay;
+    private static int moveToPlayEval;
+    private static string moveToPlayAlgebraic;
+    private static int depth;
 
     private static bool canUseBook;
     private const int PositiveInfinity = 999999;
@@ -25,6 +28,23 @@ static class Bot
         set { moveToPlay = value; }
     }
 
+    public static int MoveToPlayEval
+    {
+        get { return moveToPlayEval; }
+        set { moveToPlayEval = value; }
+    }
+
+    public static string MoveToPlayAlgebraic
+    {
+        get { return moveToPlayAlgebraic; }
+        set { moveToPlayAlgebraic = value; }
+    }
+
+    public static int Depth
+    {
+        get { return depth; }
+    }
+
     public static void MakeMove()
     {
 
@@ -44,7 +64,7 @@ static class Bot
         }
 
 
-        int depth = 5;  // Must be at least 1
+        depth = 5;  // Must be at least 1
         // Can solve a mate in (depth + 1) // 2
 
         Search.RecursiveSearch(depth, 0, NegativeInfinity, PositiveInfinity);
