@@ -4,10 +4,12 @@ using UnityEngine;
 static class Game
 {
     private static Dictionary<int, GameObject> pieceToGameObject;
+    private static BotManager botManager;
 
     public static void Init(string fen, int botColor, Dictionary<int, GameObject> pieceToGameObject)
     {
         Game.pieceToGameObject = pieceToGameObject;
+        botManager = Object.FindObjectOfType<BotManager>();
 
         Board.Init(fen);
         GameState.Init(fen);
@@ -15,15 +17,15 @@ static class Game
         Bot.Init(botColor);
         ObjectBoard.Init();  // ObjectBoard.Init() must be called after Board.Init() and Player.Init()
 
-        if (GameState.ColorToMove == botColor)
-        {
-            // Bot's turn
-            Bot.MakeMove();
-        }
-        else
+        if (GameState.ColorToMove == Player.Color)
         {
             // Player's turn
             Player.CurrentLegalMoves = LegalMoves.GetLegalMoves();
+        }
+        else
+        {
+            // Bot's turn
+            botManager.StartBotTurn();
         }
     }
 
@@ -56,7 +58,7 @@ static class Game
         else
         {
             // Now its bot's turn
-            Bot.MakeMove();
+            botManager.StartBotTurn();
         }
     }
 }

@@ -11,16 +11,24 @@ public class PieceObject : MonoBehaviour
     GameObject moveIndicator;
     List<GameObject> activeIndicators = new List<GameObject>();
 
+    private bool playerTurnReady;
+
 
     private void Awake()
     {
         GameManager gameManager = FindObjectOfType<GameManager>();
         captureIndicator = gameManager.captureIndicator;
         moveIndicator = gameManager.moveIndicator;
+
+        playerTurnReady = false;
     }
 
     private void OnMouseDown()
     {
+        if (Bot.IsThinking) { return; }
+
+        playerTurnReady = true;
+
         startPosition = transform.position;
         int startSquare = Helpers.LocationToSquare(transform.position);
         targetSquares = Player.GetLegalTargetSquares(startSquare);
@@ -42,12 +50,16 @@ public class PieceObject : MonoBehaviour
 
     private void OnMouseDrag()
     {
+        if (Bot.IsThinking || !playerTurnReady) { return; }
+
         transform.position = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
         transform.position = new Vector3(transform.position.x, transform.position.y, -1);
     }
 
     private void OnMouseUp()
     {
+        if (Bot.IsThinking || !playerTurnReady) { return; }
+
         int startSquare = Helpers.LocationToSquare(startPosition);
         int targetSquare = Helpers.LocationToSquare(transform.position);
         transform.position = new Vector3(transform.position.x, transform.position.y, 0);
@@ -82,6 +94,8 @@ public class PieceObject : MonoBehaviour
             transform.position = targetPosition;
 
             Player.MakeMove(startSquare, targetSquare);
+            playerTurnReady = false;
+
         }
         else
         {

@@ -2,6 +2,8 @@ using UnityEngine;
 
 static class Bot
 {
+    private static bool isThinking;
+
     private static int color;
     private static Move moveToPlay;
     private static int moveToPlayEval;
@@ -16,6 +18,12 @@ static class Bot
     {
         Bot.color = color;
         canUseBook = true;
+    }
+
+    public static bool IsThinking
+    {
+        get { return isThinking; }
+        set { isThinking = value; }
     }
 
     public static int Color
@@ -45,7 +53,7 @@ static class Bot
         get { return depth; }
     }
 
-    public static void MakeMove()
+    public static Move Think()
     {
 
         if (canUseBook)
@@ -53,8 +61,7 @@ static class Bot
             Move? move = TryFindMoveFromBook();
             if (move is Move bookMove)
             {
-                Game.ExecuteMove(bookMove);
-                return;
+                return bookMove;
             }
             else
             {
@@ -68,8 +75,7 @@ static class Bot
         // Can solve a mate in (depth + 1) // 2
 
         Search.RecursiveSearch(depth, 0, NegativeInfinity, PositiveInfinity);
-
-        Game.ExecuteMove(moveToPlay);
+        return moveToPlay;
     }
 
     private static Move? TryFindMoveFromBook()
