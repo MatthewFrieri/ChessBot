@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 static class Search
 {
@@ -50,17 +51,20 @@ static class Search
             // Remember the best move and evaluation
             if (evaluation > bestEvaluation)
             {
-                bestEvaluation = evaluation;
                 bestMove = move;
+                bestEvaluation = evaluation;
+
+                if (plyFromRoot == 0)
+                {
+                    Bot.MoveToPlay = bestMove;
+                    Bot.MoveToPlayEval = bestEvaluation;
+                    Bot.MoveToPlayAlgebraic = PgnUtility.MoveToAlgebraic(bestMove);
+                }
             }
 
             alpha = Math.Max(alpha, bestEvaluation);
             if (alpha >= beta) { break; }  // Prune branch
         }
-
-        Bot.MoveToPlay = bestMove;
-        Bot.MoveToPlayEval = bestEvaluation;
-        Bot.MoveToPlayAlgebraic = PgnUtility.MoveToAlgebraic(bestMove);
 
         return bestEvaluation;
     }
