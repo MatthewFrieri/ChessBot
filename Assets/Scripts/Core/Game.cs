@@ -44,6 +44,7 @@ static class Game
 
     public static void ExecuteMove(Move move)
     {
+        Debug.Log("Executing " + move);
 
         // These all must happen in this order
         ObjectBoard.RecordMove(move);

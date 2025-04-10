@@ -7,6 +7,7 @@ public class TextManager : MonoBehaviour
     public TextMeshProUGUI playerColor;
     public TextMeshProUGUI botColor;
     public TextMeshProUGUI depth;
+    public TextMeshProUGUI tableSize;
     public TextMeshProUGUI bestMove;
     public TextMeshProUGUI evaluation;
 
@@ -16,9 +17,11 @@ public class TextManager : MonoBehaviour
         playerColor.text = "Player: " + (Player.Color == Piece.White ? "White" : "Black");
         botColor.text = "Bot: " + (Bot.Color == Piece.White ? "White" : "Black");
 
-        depth.text = "Depth: " + Bot.Depth;
-        bestMove.text = "Best Move: " + Bot.MoveToPlayAlgebraic;
-        evaluation.text = "Evaluation: " + (double)(Bot.Color == Piece.White ? 1 : -1) * Bot.MoveToPlayEval / 100;
+        tableSize.text = "TT Size: " + TranspositionTable.Size();
+
+        depth.text = "Depth: " + Search.Depth;
+        bestMove.text = "Best Move: " + Search.BestMoveAlgebraic;
+        evaluation.text = "Evaluation: " + (float)(Bot.Color == Piece.White ? 1 : -1) * Search.BestEval / 100;
 
     }
 }

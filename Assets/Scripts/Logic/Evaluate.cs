@@ -4,7 +4,7 @@ using UnityEngine;
 
 static class Evaluate
 {
-    private const int CheckmateEval = 10000;
+    private const int checkmateEval = 10000;
     private static Dictionary<int, int> pieceTypeToValue = new Dictionary<int, int>{
         { 1, 100 },
         { 2, 500 },
@@ -13,6 +13,11 @@ static class Evaluate
         { 5, 900 },
         { 6, 0 }
     };
+
+    public static int CheckMateEval
+    {
+        get { return checkmateEval; }
+    }
 
     public static int Value(int piece)
     {
@@ -27,7 +32,7 @@ static class Evaluate
 
             if (LegalMoves.IsSquareUnderAttack(friendlyKingSquare, Piece.OppositeColor(GameState.ColorToMove)))
             {
-                return -CheckmateEval;  // Checkmate
+                return -checkmateEval;  // Checkmate
             }
             return 0;  // Draw
         }

@@ -14,7 +14,7 @@ public class BotManager : MonoBehaviour
             return Bot.Think();
         });
 
-        Game.ExecuteMove(bestMove);  // This must run on Unity's main thread
+        Game.ExecuteMove(bestMove);
 
         Bot.IsThinking = false;
 

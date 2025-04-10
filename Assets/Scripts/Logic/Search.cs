@@ -1,12 +1,63 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 static class Search
 {
 
+    private static int depth;
+    private static int bestEval;
+    private static Move bestMove;
+    private static string bestMoveAlgebraic;
+
+    private static DateTime endTime;
+
+    private const int PositiveInfinity = 999999;
+    private const int NegativeInfinity = -PositiveInfinity;
+    private const int RanOutOfTime = -1;
+
+    public static int Depth
+    {
+        get { return depth; }
+    }
+
+    public static string BestMoveAlgebraic
+    {
+        get { return bestMoveAlgebraic; }
+    }
+
+    public static int BestEval
+    {
+        get { return bestEval; }
+    }
+
+
+    public static Move IterativeDeepeningSearch(DateTime endTime)
+    {
+        Search.endTime = endTime;
+
+        depth = 0;
+        while (DateTime.Now < endTime)
+        {
+            depth++;
+            RecursiveSearch(depth, 0, NegativeInfinity, PositiveInfinity);
+
+            if (bestEval == Evaluate.CheckMateEval) { return bestMove; }
+
+        }
+
+        depth--;
+
+        return bestMove;
+    }
+
     public static int RecursiveSearch(int depth, int plyFromRoot, int alpha, int beta)
     {
+
+        if (DateTime.Now > endTime) { return RanOutOfTime; }
+
+
         List<Move> legalMoves = LegalMoves.GetLegalMoves();
 
         if (depth == 0)
@@ -22,8 +73,8 @@ static class Search
         MoveOrdering.OrderMoves(legalMoves, depth - 1);
 
 
-        int bestEvaluation = int.MinValue;
-        Move bestMove = Move.InvalidMove;
+        Move iterationBestMove = Move.InvalidMove;
+        int iterationBestEval = int.MinValue;
 
         foreach (Move move in legalMoves)
         {
@@ -48,24 +99,32 @@ static class Search
             GameState.UnRecordMove();
             Board.UnRecordMove();
 
-            // Remember the best move and evaluation
-            if (evaluation > bestEvaluation)
-            {
-                bestMove = move;
-                bestEvaluation = evaluation;
+            if (DateTime.Now > endTime) { return RanOutOfTime; }
 
+            // Remember the best move and evaluation
+            if (evaluation > iterationBestEval)
+            {
+                iterationBestMove = move;
+                iterationBestEval = evaluation;
+
+                // Save the best moves of the iteration to display on the game
                 if (plyFromRoot == 0)
                 {
-                    Bot.MoveToPlay = bestMove;
-                    Bot.MoveToPlayEval = bestEvaluation;
-                    Bot.MoveToPlayAlgebraic = PgnUtility.MoveToAlgebraic(bestMove);
+                    bestEval = iterationBestEval;
+                    bestMoveAlgebraic = PgnUtility.MoveToAlgebraic(iterationBestMove);
                 }
             }
 
-            alpha = Math.Max(alpha, bestEvaluation);
+            alpha = Math.Max(alpha, iterationBestEval);
             if (alpha >= beta) { break; }  // Prune branch
         }
 
-        return bestEvaluation;
+        if (plyFromRoot == 0)
+        {
+            Debug.Log("Finished depth=" + depth);
+            bestMove = iterationBestMove;
+        }
+
+        return iterationBestEval;
     }
 }
