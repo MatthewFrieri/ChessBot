@@ -4,18 +4,18 @@ using UnityEngine;
 
 static class MoveOrdering
 {
+    private const int pvBonus = 1000000000;
+    private const int captureBonus = 10000000;
+    private const int ttBonus = 5000;
 
-    private const int captureBonus = 1000000000;
-    private const int ttBonus = 100000;
 
-
-    public static void OrderMoves(List<Move> moves, int depth)
+    public static void OrderMoves(List<Move> moves, Move[] pvMoves, int depth)
     {
         Dictionary<Move, int> moveToPriority = new Dictionary<Move, int>();
 
         foreach (Move move in moves)
         {
-            int priotiy = GetPriority(move, depth);
+            int priotiy = GetPriority(move, pvMoves, depth);
 
             moveToPriority[move] = priotiy;
         }
@@ -23,8 +23,15 @@ static class MoveOrdering
         moves.Sort((moveA, moveB) => moveToPriority[moveB] - moveToPriority[moveA]);
     }
 
-    private static int GetPriority(Move move, int depth)
+    private static int GetPriority(Move move, Move[] pvMoves, int depth)
     {
+
+        // Highest prioity for PV moves
+        if (depth > 0 && pvMoves[pvMoves.Length - depth] == move)
+        {
+            return pvBonus;
+        }
+
         // Assign higher priority to low value pieces capturing high value pieces
         int targetPiece = Board.PieceAt(move.TargetSquare);
 

@@ -11,6 +11,9 @@ static class Search
     private static Move bestMove;
     private static string bestMoveAlgebraic;
 
+    private static Move[][] pvTable;
+    private static Move[] pvMoves;
+
     private static DateTime endTime;
 
     private const int PositiveInfinity = 999999;
@@ -32,6 +35,23 @@ static class Search
         get { return bestEval; }
     }
 
+    private static void PvInit(int depth)
+    {
+        // Save the previous PV
+        pvMoves = new Move[depth - 1];
+        for (int i = 0; i < depth - 1; i++)
+        {
+            pvMoves[i] = pvTable[0][i];
+        }
+
+        // Reset the PV table
+        pvTable = new Move[depth][];
+        for (int i = 0; i < depth; i++)
+        {
+            pvTable[i] = new Move[depth]; // Initialize each row
+        }
+    }
+
 
     public static Move IterativeDeepeningSearch(DateTime endTime)
     {
@@ -41,6 +61,16 @@ static class Search
         while (DateTime.Now < endTime)
         {
             depth++;
+
+            PvInit(depth);
+
+            Debug.Log("print start");
+            for (int i = 0; i < depth - 1; i++)
+            {
+                Debug.Log(pvMoves[i]);
+            }
+            Debug.Log("print end");
+
             RecursiveSearch(depth, 0, NegativeInfinity, PositiveInfinity);
 
             if (bestEval == Evaluate.CheckMateEval) { return bestMove; }
@@ -70,7 +100,7 @@ static class Search
         }
 
         // Order legalMoves so that better moves are searched first. This improves alpha beta pruning
-        MoveOrdering.OrderMoves(legalMoves, depth - 1);
+        MoveOrdering.OrderMoves(legalMoves, pvMoves, depth - 1);
 
 
         Move iterationBestMove = Move.InvalidMove;
@@ -85,8 +115,8 @@ static class Search
             // Check transposition table for an evaluation
             int? ttEvaluation = TranspositionTable.TryLookupPosition(depth - 1);
 
-            int evaluation = ttEvaluation is int eval
-            ? evaluation = eval
+            int evaluation = ttEvaluation is int ttEval
+            ? ttEval
             : -RecursiveSearch(depth - 1, plyFromRoot + 1, -beta, -alpha);
 
             // Update transposition table if needed
@@ -106,6 +136,15 @@ static class Search
             {
                 iterationBestMove = move;
                 iterationBestEval = evaluation;
+
+
+                // Update PV table
+                pvTable[plyFromRoot][0] = move;
+                for (int i = 1; i < depth; i++)
+                {
+                    pvTable[plyFromRoot][i] = pvTable[plyFromRoot + 1][i - 1];
+                }
+
 
                 // Save the best moves of the iteration to display on the game
                 if (plyFromRoot == 0)

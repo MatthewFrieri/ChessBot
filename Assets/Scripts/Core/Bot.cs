@@ -36,13 +36,12 @@ static class Bot
             }
             else
             {
-                Debug.Log("found nothing :(");
                 canUseBook = false;
             }
         }
 
 
-        DateTime endTime = DateTime.Now + TimeSpan.FromMilliseconds(20000);
+        DateTime endTime = DateTime.Now + TimeSpan.FromMilliseconds(5000);
 
         Move moveToPlay = Search.IterativeDeepeningSearch(endTime);
         return moveToPlay;
@@ -50,12 +49,8 @@ static class Bot
 
     private static Move? TryFindMoveFromBook()
     {
-
-        Debug.Log("Trying to find move from book");
         string algebraic = Opening.NextMoveAlgebraic();
         if (algebraic == null) { return null; }
-
-        Debug.Log("Found: " + algebraic);
 
         return PgnUtility.AlgebraicToMove(algebraic);
     }

@@ -30,34 +30,32 @@ public readonly struct Move
 
     public int StartSquare
     {
-        get
-        {
-            return moveValue & startSquareMask;
-        }
+        get { return moveValue & startSquareMask; }
     }
 
     public int TargetSquare
     {
-        get
-        {
-            return (moveValue & targetSquareMask) >> 6;
-        }
+        get { return (moveValue & targetSquareMask) >> 6; }
     }
 
     public int MoveFlag
     {
-        get
-        {
-            return (moveValue & flagMask) >> 12;
-        }
+        get { return (moveValue & flagMask) >> 12; }
     }
 
     public static Move InvalidMove
     {
-        get
-        {
-            return new Move(0, 0);
-        }
+        get { return new Move(0, 0); }
+    }
+
+    public static bool operator ==(Move move1, Move move2)
+    {
+        return move1.moveValue == move2.moveValue;
+    }
+
+    public static bool operator !=(Move move1, Move move2)
+    {
+        return move1.moveValue != move2.moveValue;
     }
 
     public override string ToString()
