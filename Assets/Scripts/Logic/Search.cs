@@ -7,9 +7,11 @@ static class Search
 {
 
     private static int depth;
-    private static int bestEval;
     private static Move bestMove;
+    private static int bestEval;
     private static string bestMoveAlgebraic;
+    private static int prevIterBestEval;
+    private static string prevIterBestMoveAlgebraic;
 
     private static Move[][] pvTable;
     private static Move[] pvMoves;
@@ -64,12 +66,8 @@ static class Search
 
             PvInit(depth);
 
-            Debug.Log("print start");
-            for (int i = 0; i < depth - 1; i++)
-            {
-                Debug.Log(pvMoves[i]);
-            }
-            Debug.Log("print end");
+            prevIterBestMoveAlgebraic = bestMoveAlgebraic;
+            prevIterBestEval = bestEval;
 
             RecursiveSearch(depth, 0, NegativeInfinity, PositiveInfinity);
 
@@ -78,6 +76,8 @@ static class Search
         }
 
         depth--;
+        bestMoveAlgebraic = prevIterBestMoveAlgebraic;
+        bestEval = prevIterBestEval;
 
         return bestMove;
     }
@@ -160,7 +160,6 @@ static class Search
 
         if (plyFromRoot == 0)
         {
-            Debug.Log("Finished depth=" + depth);
             bestMove = iterationBestMove;
         }
 
