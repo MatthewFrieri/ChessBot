@@ -71,7 +71,7 @@ static class Search
 
             RecursiveSearch(depth, 0, NegativeInfinity, PositiveInfinity);
 
-            if (bestEval == Evaluate.CheckMateEval) { return bestMove; }
+            if (Math.Abs(bestEval) == Evaluate.CheckMateEval) { return bestMove; }
 
         }
 
