@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour
         pieceToGameObject[Piece.King | Piece.Black] = kingBlack;
 
 
-        string pgn = "1. e4 c6 2. b3 d5 3. f3 Nf6 4. e5 Nh5 5. Bb2 Bf5 6. Bd3 Bxd3 7. cxd3 e6 8. Ne2 Bc5 9. Kf1 O-O 10. d4 Be7 11. Qe1 Nd7 12. a3 Nb6 13. d3 f6 14. a4 fxe5 15. dxe5 Bc5 16. Ba3 Bxa3 17. Nxa3 Qg5 18. Ng3 Nf4 19. Qe3 Nd7 20. Ne2 Nxe5 21. Nxf4 Rxf4";
+        string pgn = "1. Nc3 a5 2. b4 b6 3. bxa5 c6 4. axb6 Ra7 5. bxa7 Bb7 6. axb8=N c5 7. Nc6 d6 8. Ne5 Bc8 9. Ngf3 Bd7 10. Ng4 Bc8 11. Ne3 Bd7 12. Nf5 Bc8 13. Nb5 Bb7 14. Nbd4 Bc8 15. Nb3 Bd7";
 
         Game.Init(Piece.Black, pieceToGameObject, pgn);
     }

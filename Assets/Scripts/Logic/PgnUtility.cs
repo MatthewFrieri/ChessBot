@@ -218,26 +218,34 @@ static class PgnUtility
                 break;
         }
 
-        // Differentiator for when two identical non-pawns can move to the same square 
+        // Differentiator for when at least two identical non-pawns can move to the same square 
         string differentiator = "";
-        if (friendlyPieceType != Piece.Pawn)
+        List<int> similarSquares = LegalMoves.SquaresThatSquareIsTargettedBy(move.TargetSquare, friendlyPiece);
+
+        if (friendlyPieceType != Piece.Pawn && similarSquares.Count > 1)
         {
-            List<int> similarSquares = LegalMoves.SquaresThatSquareIsTargettedBy(move.TargetSquare, friendlyPiece);
-            bool identifyFile = false;
-            bool identifyRank = false;
+            bool uniqueFile = true;
+            bool uniqueRank = true;
+
             foreach (int square in similarSquares)
             {
                 if (square == move.StartSquare) { continue; }
-                if (Board.File(square) == Board.File(move.StartSquare)) { identifyRank = true; continue; }
-                if (Board.Rank(square) == Board.Rank(move.StartSquare)) { identifyFile = true; continue; }
-                if (Board.File(square) != Board.File(move.StartSquare) && Board.Rank(square) != Board.Rank(move.StartSquare))
-                {
-                    identifyFile = true;
-                    identifyRank = true;
-                }
+                if (Board.File(square) == Board.File(move.StartSquare)) { uniqueFile = false; }
+                if (Board.Rank(square) == Board.Rank(move.StartSquare)) { uniqueRank = false; }
             }
-            if (identifyFile) { differentiator += startSquareAlgebraic.Substring(0, 1); }
-            if (identifyRank) { differentiator += startSquareAlgebraic.Substring(1, 1); }
+
+            if (uniqueFile)
+            {
+                differentiator = startSquareAlgebraic.Substring(0, 1);
+            }
+            else if (uniqueRank)
+            {
+                differentiator = startSquareAlgebraic.Substring(1, 1);
+            }
+            else
+            {
+                differentiator = startSquareAlgebraic;
+            }
         }
 
         return friendlyPieceSymbol + differentiator + pawnFileSymbol + captureSymbol + targetSquareAlgebraic + promotionSymbol + checkSymbol;
