@@ -5,10 +5,26 @@ static class Board
 {
     private static Stack<int[]> squaresStack;
 
-    public static void Init(string fen)
+    public static void Init()
     {
         squaresStack = new Stack<int[]>();
-        LoadFromFEN(fen);
+
+        int[] squares = new int[64];
+        squaresStack.Push(squares);
+
+        // Set up the starting position
+        squares[0] = squares[7] = Piece.White | Piece.Rook;
+        squares[1] = squares[6] = Piece.White | Piece.Knight;
+        squares[2] = squares[5] = Piece.White | Piece.Bishop;
+        squares[3] = Piece.White | Piece.Queen;
+        squares[4] = Piece.White | Piece.King;
+        for (int i = 8; i < 16; i++) { squares[i] = Piece.White | Piece.Pawn; }
+        squares[56] = squares[63] = Piece.Black | Piece.Rook;
+        squares[57] = squares[62] = Piece.Black | Piece.Knight;
+        squares[58] = squares[61] = Piece.Black | Piece.Bishop;
+        squares[59] = Piece.Black | Piece.Queen;
+        squares[60] = Piece.Black | Piece.King;
+        for (int i = 48; i < 56; i++) { squares[i] = Piece.Black | Piece.Pawn; }
     }
 
     public static int PieceAt(int square)
@@ -78,50 +94,6 @@ static class Board
         }
     }
 
-    private static void LoadFromFEN(string fen)
-    {
-        int[] squares = new int[64];
-        squaresStack.Push(squares);
-
-        Dictionary<char, int> symbolToPieceType = new Dictionary<char, int>{
-            {'p', Piece.Pawn},
-            {'r', Piece.Rook},
-            {'n', Piece.Knight},
-            {'b', Piece.Bishop},
-            {'q', Piece.Queen},
-            {'k', Piece.King}
-        };
-
-        int rank = 7;
-        int file = 0;
-
-        string piecePlacement = fen.Split(' ')[0];
-
-        foreach (char symbol in piecePlacement)
-        {
-            if (symbol == '/')
-            {
-                rank -= 1;
-                file = 0;
-                continue;
-            }
-
-            if (char.IsDigit(symbol))
-            {
-                file += (int)char.GetNumericValue(symbol);
-                continue;
-            }
-
-
-            int pieceType = symbolToPieceType[char.ToLower(symbol)];
-            int pieceColor = char.IsUpper(symbol) ? Piece.White : Piece.Black;
-            int piece = pieceType | pieceColor;
-
-            squares[rank * 8 + file] = piece;
-
-            file += 1;
-        }
-    }
 
     public static string HalfFen()
     {

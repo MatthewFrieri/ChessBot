@@ -12,9 +12,7 @@ static class GameState
     private static Stack<List<string>> pgnStack;
 
 
-
-
-    public static void Init(string fen)
+    public static void Init()
     {
         colorToMoveStack = new Stack<int>();
         vulnerableEnPassantSquareStack = new Stack<int?>();
@@ -22,7 +20,15 @@ static class GameState
         halfMoveClockStack = new Stack<int>();
         fullMoveNumberStack = new Stack<int>();
         pgnStack = new Stack<List<string>>();
-        LoadFromFEN(fen);
+
+        // Load the starting state
+        colorToMoveStack.Push(Piece.White);
+        castleSquaresStack.Push(new List<int> { 2, 6, 58, 62 });
+        vulnerableEnPassantSquareStack.Push(null);
+        halfMoveClockStack.Push(0);
+        fullMoveNumberStack.Push(1);
+
+        pgnStack.Push(new List<string>());
     }
 
     public static int ColorToMove

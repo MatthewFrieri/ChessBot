@@ -29,9 +29,6 @@ public class GameManager : MonoBehaviour
     public AudioClip captureAudioClip;
     public AudioClip checkAudioClip;
 
-
-    private const string StartingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-
     private void Start()
     {
 
@@ -50,7 +47,10 @@ public class GameManager : MonoBehaviour
         pieceToGameObject[Piece.Queen | Piece.Black] = queenBlack;
         pieceToGameObject[Piece.King | Piece.Black] = kingBlack;
 
-        Game.Init(StartingFen, Piece.Black, pieceToGameObject);
+
+        string pgn = "1. e4 c6 2. b3 d5 3. f3 Nf6 4. e5 Nh5 5. Bb2 Bf5 6. Bd3 Bxd3 7. cxd3 e6 8. Ne2 Bc5 9. Kf1 O-O 10. d4 Be7 11. Qe1 Nd7 12. a3 Nb6 13. d3 f6 14. a4 fxe5 15. dxe5 Bc5 16. Ba3 Bxa3 17. Nxa3 Qg5 18. Ng3 Nf4 19. Qe3 Nd7 20. Ne2 Nxe5 21. Nxf4 Rxf4";
+
+        Game.Init(Piece.Black, pieceToGameObject, pgn);
     }
 
 

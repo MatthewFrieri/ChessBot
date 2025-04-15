@@ -8,17 +8,20 @@ static class Game
     private static GameManager gameManager;
     private static BotManager botManager;
 
-    public static void Init(string fen, int botColor, Dictionary<int, GameObject> pieceToGameObject)
+    public static void Init(int botColor, Dictionary<int, GameObject> pieceToGameObject, string pgn = "")
     {
         Game.pieceToGameObject = pieceToGameObject;
         gameManager = Object.FindObjectOfType<GameManager>();
         botManager = Object.FindObjectOfType<BotManager>();
 
-        Board.Init(fen);
-        GameState.Init(fen);
+        Board.Init();
+        GameState.Init();
         Player.Init(Piece.OppositeColor(botColor));
         Bot.Init(botColor);
         ObjectBoard.Init();  // ObjectBoard.Init() must be called after Board.Init() and Player.Init()
+
+        RecordStartPgn(pgn);
+
 
         if (GameState.ColorToMove == Player.Color)
         {
@@ -32,6 +35,28 @@ static class Game
         }
     }
 
+    private static void RecordStartPgn(string pgn)
+    {
+        if (pgn == "") { return; }
+
+        List<string> algebraics = new List<string>();
+
+        // Remove the move numbers
+        foreach (string algebraic in pgn.Split(' '))
+        {
+            if (char.IsDigit(algebraic[0])) { continue; }
+            algebraics.Add(algebraic);
+        }
+
+        // Execute moves
+        foreach (string algebraic in algebraics)
+        {
+            Move move = PgnUtility.AlgebraicToMove(algebraic);
+            ExecuteMove(move, true);
+        }
+    }
+
+
     public static Dictionary<int, GameObject> PieceToGameObject
     {
         get { return pieceToGameObject; }
@@ -42,13 +67,15 @@ static class Game
         return Board.HalfFen() + " " + GameState.HalfFen();
     }
 
-    public static void ExecuteMove(Move move)
+    public static void ExecuteMove(Move move, bool isSetup = false)
     {
         // These all must happen in this order
         ObjectBoard.RecordMove(move);
         GameState.RecordMove(move);
         GameState.UpdatePgn(move);  // Only needs to happen once when we decide to execute
         Board.RecordMove(move);
+
+        if (isSetup) { return; }
 
         PlayCorrectSound();
 
