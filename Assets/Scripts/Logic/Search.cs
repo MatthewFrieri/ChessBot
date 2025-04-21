@@ -71,7 +71,7 @@ static class Search
             prevDepthBestMoveAlgebraic = bestMoveAlgebraic;
             prevDepthBestEval = bestEval;
 
-            Debug.Log("Starting at depth=" + depth);
+            // Debug.Log("Starting at depth=" + depth);
             // Debug.Log("bestMove: " + bestMove);
             // Debug.Log("bestEval: " + bestEval);
 
@@ -104,16 +104,10 @@ static class Search
 
         List<Move> legalMoves = LegalMoves.GetLegalMoves();
 
+
         if (depth == 0)
         {
-            int temp = Evaluate.EvaluatePosition(legalMoves);
-
-            // if (temp == -Evaluate.CheckMateEval)
-            // {
-            //     Debug.Log("Checkmate found: " + );
-            // }
-
-            return temp;
+            return Evaluate.EvaluatePosition(legalMoves);
         }
         if (legalMoves.Count == 0)
         {
@@ -124,8 +118,6 @@ static class Search
         // Order legalMoves so that better moves are searched first. This improves alpha beta pruning
         MoveOrdering.OrderMoves(legalMoves, pvMoves, depth - 1);
 
-        // Debug.Log("reached");
-        // Debug.Log(legalMoves.Count);
 
 
         Move iterationBestMove = Move.InvalidMove;
@@ -142,7 +134,7 @@ static class Search
             int? ttEvaluation = TranspositionTable.TryLookupPosition(depth - 1);
 
 
-            if (ttEvaluation is int ttEval)  // Successful lookup
+            if (ttEvaluation is int ttEval)  // Successful lookup in TT
             {
                 evaluation = -ttEval;
             }
@@ -151,15 +143,15 @@ static class Search
                 int childEval = RecursiveSearch(depth - 1, plyFromRoot + 1, -beta, -alpha);
                 evaluation = -childEval;
 
-                if (evaluation == Evaluate.CheckMateEval)
-                {
-                    Debug.Log("+ " + (GameState.Pgn.Count % 2 == 0 ? "Even " : "Odd "));
-                }
+                // if (childEval == Evaluate.CheckMateEval)
+                // {
+                //     Debug.Log("+ " + (GameState.ColorToMove == Piece.White ? "White to move " : "Black to move ") + string.Join(" ", GameState.Pgn.GetRange(98, GameState.Pgn.Count - 98)));
+                // }
 
-                if (evaluation == -Evaluate.CheckMateEval)
-                {
-                    Debug.Log("- " + (GameState.Pgn.Count % 2 == 0 ? "Even " : "Odd "));
-                }
+                // if (childEval == -Evaluate.CheckMateEval)
+                // {
+                //     Debug.Log("- " + (GameState.ColorToMove == Piece.White ? "White to move " : "Black to move ") + string.Join(" ", GameState.Pgn.GetRange(98, GameState.Pgn.Count - 98)));
+                // }
 
                 TranspositionTable.StorePosition(childEval, depth - 1);
             }
@@ -195,8 +187,9 @@ static class Search
             }
 
             alpha = Math.Max(alpha, iterationBestEval);
-            if (alpha >= beta) { break; }  // Prune branch
+            if (alpha > beta) { break; }  // Prune branch
         }
+
 
         if (plyFromRoot == 0)
         {
