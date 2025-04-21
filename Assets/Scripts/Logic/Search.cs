@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 static class Search
@@ -10,8 +9,8 @@ static class Search
     private static Move bestMove;
     private static int bestEval;
     private static string bestMoveAlgebraic;
-    private static int prevIterBestEval;
-    private static string prevIterBestMoveAlgebraic;
+    private static int prevDepthBestEval;
+    private static string prevDepthBestMoveAlgebraic;
 
     private static Move[][] pvTable;
     private static Move[] pvMoves;
@@ -52,12 +51,15 @@ static class Search
         {
             pvTable[i] = new Move[depth]; // Initialize each row
         }
+
     }
 
 
     public static Move IterativeDeepeningSearch(DateTime endTime)
     {
         Search.endTime = endTime;
+        bestEval = NegativeInfinity;
+        bestMove = Move.InvalidMove;
 
         depth = 0;
         while (DateTime.Now < endTime)
@@ -66,18 +68,30 @@ static class Search
 
             PvInit(depth);
 
-            prevIterBestMoveAlgebraic = bestMoveAlgebraic;
-            prevIterBestEval = bestEval;
+            prevDepthBestMoveAlgebraic = bestMoveAlgebraic;
+            prevDepthBestEval = bestEval;
+
+            Debug.Log("Starting at depth=" + depth);
+            // Debug.Log("bestMove: " + bestMove);
+            // Debug.Log("bestEval: " + bestEval);
 
             RecursiveSearch(depth, 0, NegativeInfinity, PositiveInfinity);
+            // Debug.Log("Done");
 
-            if (Math.Abs(bestEval) == Evaluate.CheckMateEval) { return bestMove; }
+            if (bestEval == Evaluate.CheckMateEval)
+            {
+                // Debug.Log("bestMove: " + bestMove);
+                // Debug.Log("bestEval: " + bestEval);
+                return bestMove;
+            }
 
         }
 
         depth--;
-        bestMoveAlgebraic = prevIterBestMoveAlgebraic;
-        bestEval = prevIterBestEval;
+        bestMoveAlgebraic = prevDepthBestMoveAlgebraic;
+        bestEval = prevDepthBestEval;
+
+
 
         return bestMove;
     }
@@ -92,19 +106,30 @@ static class Search
 
         if (depth == 0)
         {
-            return Evaluate.EvaluatePosition(legalMoves);
+            int temp = Evaluate.EvaluatePosition(legalMoves);
+
+            // if (temp == -Evaluate.CheckMateEval)
+            // {
+            //     Debug.Log("Checkmate found: " + );
+            // }
+
+            return temp;
         }
         if (legalMoves.Count == 0)
         {
-            return Evaluate.EvaluatePosition(legalMoves) + plyFromRoot;  // plyFromRoot prioritizes mates that happen sooner 
+            return Evaluate.EvaluatePosition(legalMoves);  // TEMP
+            // return Evaluate.EvaluatePosition(legalMoves) + plyFromRoot;  // plyFromRoot prioritizes mates that happen sooner 
         }
 
         // Order legalMoves so that better moves are searched first. This improves alpha beta pruning
         MoveOrdering.OrderMoves(legalMoves, pvMoves, depth - 1);
 
+        // Debug.Log("reached");
+        // Debug.Log(legalMoves.Count);
+
 
         Move iterationBestMove = Move.InvalidMove;
-        int iterationBestEval = int.MinValue;
+        int iterationBestEval = NegativeInfinity;
 
         foreach (Move move in legalMoves)
         {
@@ -113,17 +138,32 @@ static class Search
             Board.RecordMove(move);
 
             // Check transposition table for an evaluation
+            int evaluation;
             int? ttEvaluation = TranspositionTable.TryLookupPosition(depth - 1);
 
-            int evaluation = ttEvaluation is int ttEval
-            ? ttEval
-            : -RecursiveSearch(depth - 1, plyFromRoot + 1, -beta, -alpha);
 
-            // Update transposition table if needed
-            if (ttEvaluation is null)
+            if (ttEvaluation is int ttEval)  // Successful lookup
             {
-                TranspositionTable.StorePosition(evaluation, depth - 1);
+                evaluation = -ttEval;
             }
+            else  // Could not find position in TT
+            {
+                int childEval = RecursiveSearch(depth - 1, plyFromRoot + 1, -beta, -alpha);
+                evaluation = -childEval;
+
+                if (evaluation == Evaluate.CheckMateEval)
+                {
+                    Debug.Log("+ " + (GameState.Pgn.Count % 2 == 0 ? "Even " : "Odd "));
+                }
+
+                if (evaluation == -Evaluate.CheckMateEval)
+                {
+                    Debug.Log("- " + (GameState.Pgn.Count % 2 == 0 ? "Even " : "Odd "));
+                }
+
+                TranspositionTable.StorePosition(childEval, depth - 1);
+            }
+
 
             // Undo the pretend move
             GameState.UnRecordMove();

@@ -75,6 +75,10 @@ static class GameState
         castleSquaresStack.Pop();
         halfMoveClockStack.Pop();
         fullMoveNumberStack.Pop();
+
+
+
+        pgnStack.Pop(); // TEMP
     }
 
     // GameState.RecordMove() must happen before Board.RecordMove() 
@@ -118,6 +122,10 @@ static class GameState
 
         bool shouldResetClock = Piece.Type(Board.PieceAt(move.StartSquare)) == Piece.Pawn || Board.PieceAt(move.TargetSquare) != Piece.None;
         halfMoveClockStack.Push(shouldResetClock ? 0 : HalfMoveClock + 1);
+
+
+        UpdatePgn(move); // t
+
     }
 
 

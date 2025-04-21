@@ -4,7 +4,7 @@ using UnityEngine;
 
 static class MoveOrdering
 {
-    private const int pvBonus = 1000000000;
+    private const int pvBonus = 20000000;
     private const int captureBonus = 10000000;
     private const int ttBonus = 5000;
 

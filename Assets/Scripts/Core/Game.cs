@@ -72,7 +72,7 @@ static class Game
         // These all must happen in this order
         ObjectBoard.RecordMove(move);
         GameState.RecordMove(move);
-        GameState.UpdatePgn(move);  // Only needs to happen once when we decide to execute
+        // GameState.UpdatePgn(move);  // Only needs to happen once when we decide to execute
         Board.RecordMove(move);
 
         if (isSetup) { return; }

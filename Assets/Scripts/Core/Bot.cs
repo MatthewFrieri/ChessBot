@@ -41,7 +41,7 @@ static class Bot
         }
 
 
-        DateTime endTime = DateTime.Now + TimeSpan.FromMilliseconds(30000);
+        DateTime endTime = DateTime.Now + TimeSpan.FromMilliseconds(60000);
 
         Move moveToPlay = Search.IterativeDeepeningSearch(endTime);
         return moveToPlay;
