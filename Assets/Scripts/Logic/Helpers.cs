@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 static class Helpers
@@ -30,5 +31,13 @@ static class Helpers
         int rank = (int)location.y;
 
         return 8 * rank + file;
+    }
+
+    public static string FormatTime(float time)
+    {
+        int minutes = (int)(time / 60);
+        int seconds = (int)(time % 60);
+        return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
     }
 }

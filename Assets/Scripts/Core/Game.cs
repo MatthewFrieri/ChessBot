@@ -8,14 +8,14 @@ static class Game
     private static GameManager gameManager;
     private static BotManager botManager;
 
-    public static void Init(int botColor, Dictionary<int, GameObject> pieceToGameObject, string pgn = "")
+    public static void Init(float time, int botColor, Dictionary<int, GameObject> pieceToGameObject, string pgn = "")
     {
         Game.pieceToGameObject = pieceToGameObject;
         gameManager = Object.FindObjectOfType<GameManager>();
         botManager = Object.FindObjectOfType<BotManager>();
 
         Board.Init();
-        GameState.Init();
+        GameState.Init(time);
         Player.Init(Piece.OppositeColor(botColor));
         Bot.Init(botColor);
         ObjectBoard.Init();  // ObjectBoard.Init() must be called after Board.Init() and Player.Init()
@@ -72,7 +72,7 @@ static class Game
         // These all must happen in this order
         ObjectBoard.RecordMove(move);
         GameState.RecordMove(move);
-        // GameState.UpdatePgn(move);  // Only needs to happen once when we decide to execute
+        GameState.UpdatePgn(move);  // Only needs to happen once when we decide to execute
         Board.RecordMove(move);
 
         if (isSetup) { return; }

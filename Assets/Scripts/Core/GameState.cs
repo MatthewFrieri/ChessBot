@@ -11,8 +11,11 @@ static class GameState
     private static Stack<int> fullMoveNumberStack;
     private static Stack<List<string>> pgnStack;
 
+    private static float whiteTime;
+    private static float blackTime;
 
-    public static void Init()
+
+    public static void Init(float time)
     {
         colorToMoveStack = new Stack<int>();
         vulnerableEnPassantSquareStack = new Stack<int?>();
@@ -29,6 +32,9 @@ static class GameState
         fullMoveNumberStack.Push(1);
 
         pgnStack.Push(new List<string>());
+
+        whiteTime = time;
+        blackTime = time;
     }
 
     public static int ColorToMove
@@ -61,6 +67,26 @@ static class GameState
         get { return pgnStack.Peek(); }
     }
 
+    public static float WhiteTime
+    {
+        get { return whiteTime; }
+    }
+
+    public static float BlackTime
+    {
+        get { return blackTime; }
+    }
+
+    public static void DecrementWhiteTime(float deltaTime)
+    {
+        whiteTime -= deltaTime;
+    }
+
+    public static void DecrementBlackTime(float deltaTime)
+    {
+        blackTime -= deltaTime;
+    }
+
     public static void UpdatePgn(Move move)
     {
         List<string> newPgn = new List<string>(Pgn);
@@ -75,10 +101,6 @@ static class GameState
         castleSquaresStack.Pop();
         halfMoveClockStack.Pop();
         fullMoveNumberStack.Pop();
-
-
-
-        pgnStack.Pop(); // TEMP
     }
 
     // GameState.RecordMove() must happen before Board.RecordMove() 
@@ -122,10 +144,6 @@ static class GameState
 
         bool shouldResetClock = Piece.Type(Board.PieceAt(move.StartSquare)) == Piece.Pawn || Board.PieceAt(move.TargetSquare) != Piece.None;
         halfMoveClockStack.Push(shouldResetClock ? 0 : HalfMoveClock + 1);
-
-
-        UpdatePgn(move); // t
-
     }
 
 
