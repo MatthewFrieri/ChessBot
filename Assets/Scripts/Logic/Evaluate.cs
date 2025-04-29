@@ -24,9 +24,9 @@ static class Evaluate
         return pieceTypeToValue[Piece.Type(piece)];
     }
 
-    public static int EvaluatePosition(List<Move> legalMoves)
+    public static int EvaluatePosition(int legalMovesCount)
     {
-        if (legalMoves.Count == 0)
+        if (legalMovesCount == 0)
         {
             int friendlyKingSquare = LegalMoves.FindFriendlyKingSquare();
 
@@ -34,11 +34,22 @@ static class Evaluate
             {
                 return -checkmateEval;  // Checkmate
             }
-            return 0;  // Draw
+            return 0;  // Draw by stalemate
         }
 
-        int perspective = GameState.ColorToMove == Piece.White ? 1 : -1;
+        if (GameState.HalfMoveClock >= 50)
+        {
+            return 0;  // Draw by 50 move rule
+        }
 
+        if (Board.Has3MoveRepetitioned())
+        {
+            return 0;  // Draw by 3 move repetition
+        }
+
+
+
+        int perspective = GameState.ColorToMove == Piece.White ? 1 : -1;
 
         int whiteValue = GetMaterialValue(Piece.White) + GetWeightValue(Piece.White);
         int blackValue = GetMaterialValue(Piece.Black) + GetWeightValue(Piece.Black);

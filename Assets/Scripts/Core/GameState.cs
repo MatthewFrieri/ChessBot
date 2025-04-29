@@ -147,41 +147,6 @@ static class GameState
     }
 
 
-    private static void LoadFromFEN(string fen)
-    {
-        string[] elements = fen.Split(" ");
-
-        // Fix a half fen
-        if (elements.Length == 5)
-        {
-            elements = elements.Prepend("").ToArray();
-        }
-
-        string colorToMove = elements[1];
-        string castlingRights = elements[2];
-        string vulnerableEnPassantAlgebraic = elements[3];
-        string halfMoveClock = elements[4];   // NEED TO USE
-        string fullMoveNumber = elements[5];   // NEED TO USE
-
-        colorToMoveStack.Push(colorToMove == "w" ? Piece.White : Piece.Black);
-
-        List<int> castleSquares = new List<int>();
-        if (castlingRights.Contains("K")) { castleSquares.Add(6); }
-        if (castlingRights.Contains("Q")) { castleSquares.Add(2); }
-        if (castlingRights.Contains("k")) { castleSquares.Add(62); }
-        if (castlingRights.Contains("q")) { castleSquares.Add(58); }
-        castleSquaresStack.Push(castleSquares);
-
-        vulnerableEnPassantSquareStack.Push(vulnerableEnPassantAlgebraic == "-" ? null : Helpers.AlgebraicToSquare(vulnerableEnPassantAlgebraic));
-
-        halfMoveClockStack.Push(int.Parse(halfMoveClock));
-
-        fullMoveNumberStack.Push(int.Parse(fullMoveNumber));
-
-        pgnStack.Push(new List<string>());
-
-    }
-
     public static string HalfFen()
     {
         string fen = "";

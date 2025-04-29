@@ -41,7 +41,26 @@ static class Bot
         }
 
 
-        DateTime endTime = DateTime.Now + TimeSpan.FromMilliseconds(30000);
+        float timeLeft;
+        if (Color == Piece.White)
+        {
+            timeLeft = GameState.WhiteTime;
+        }
+        else
+        {
+            timeLeft = GameState.BlackTime;
+        }
+
+        float maxPercent = timeLeft * 0.50f;
+        float baseTime = 10.0f;
+
+        float timeToThink = Math.Min(maxPercent, baseTime);
+
+
+        timeToThink = 180 / 80;
+
+
+        DateTime endTime = DateTime.Now + TimeSpan.FromMilliseconds(timeToThink * 1000);
 
         Move moveToPlay = Search.IterativeDeepeningSearch(endTime);
         return moveToPlay;

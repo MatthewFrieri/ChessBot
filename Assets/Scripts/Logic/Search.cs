@@ -107,12 +107,11 @@ static class Search
 
         if (depth == 0)
         {
-            return Evaluate.EvaluatePosition(legalMoves);
+            return Evaluate.EvaluatePosition(legalMoves.Count);
         }
         if (legalMoves.Count == 0)
         {
-            return Evaluate.EvaluatePosition(legalMoves);  // TEMP
-            // return Evaluate.EvaluatePosition(legalMoves) + plyFromRoot;  // plyFromRoot prioritizes mates that happen sooner 
+            return Evaluate.EvaluatePosition(legalMoves.Count) + plyFromRoot;  // plyFromRoot prioritizes mates that happen sooner 
         }
 
         // Order legalMoves so that better moves are searched first. This improves alpha beta pruning

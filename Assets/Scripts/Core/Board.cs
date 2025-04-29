@@ -1,9 +1,12 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 static class Board
 {
     private static Stack<int[]> squaresStack;
+    private static Dictionary<string, int> boardFenToFrequency;
+
 
     public static void Init()
     {
@@ -25,6 +28,9 @@ static class Board
         squares[59] = Piece.Black | Piece.Queen;
         squares[60] = Piece.Black | Piece.King;
         for (int i = 48; i < 56; i++) { squares[i] = Piece.Black | Piece.Pawn; }
+
+        boardFenToFrequency = new Dictionary<string, int>();
+        boardFenToFrequency[HalfFen()] = 1;
     }
 
     public static int PieceAt(int square)
@@ -32,8 +38,23 @@ static class Board
         return squaresStack.Peek()[square];
     }
 
+    public static bool Has3MoveRepetitioned()
+    {
+        return boardFenToFrequency.Values.Max() >= 3;
+    }
+
     public static void UnRecordMove()
     {
+        string fen = HalfFen();
+        if (boardFenToFrequency[fen] == 1)
+        {
+            boardFenToFrequency.Remove(fen);
+        }
+        else
+        {
+            boardFenToFrequency[fen] -= 1;
+        }
+
         squaresStack.Pop();
     }
 
@@ -91,6 +112,16 @@ static class Board
                 break;
             case Move.Flag.PawnTwoForward:
                 break;
+        }
+
+        string fen = HalfFen();
+        if (boardFenToFrequency.ContainsKey(fen))
+        {
+            boardFenToFrequency[fen] += 1;
+        }
+        else
+        {
+            boardFenToFrequency[fen] = 1;
         }
     }
 
