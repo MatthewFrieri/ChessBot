@@ -178,10 +178,12 @@ static class PgnUtility
             }
         }
 
-        // Check
+        // Check and checkmate
         Board.RecordMove(move);  // Pretend to make the move. * This is okay because GameState.RecordMove() essentially already happened *
         int enemyKingSquare = LegalMoves.FindFriendlyKingSquare();
-        string checkSymbol = LegalMoves.IsSquareUnderAttack(enemyKingSquare, Piece.OppositeColor(GameState.ColorToMove)) ? "+" : "";
+        bool isInCheck = LegalMoves.IsSquareUnderAttack(enemyKingSquare, Piece.OppositeColor(GameState.ColorToMove));
+        bool hasMovesAfter = LegalMoves.GetLegalMoves().Count > 0;
+        string checkSymbol = isInCheck ? (hasMovesAfter ? "+" : "#") : "";
         Board.UnRecordMove();   // Undo the pretend move
 
         // Target square
