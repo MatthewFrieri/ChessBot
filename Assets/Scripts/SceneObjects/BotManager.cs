@@ -9,9 +9,14 @@ public class BotManager : MonoBehaviour
 
         Bot.IsThinking = true;
 
-        Move bestMove = await Task.Run(() =>
+        Move bestMove = await Task.Run(async () =>
         {
-            return Bot.Think();
+            Move move = Bot.Think();
+            if (Bot.CanUseBook)
+            {
+                await Task.Delay(500);
+            }
+            return move;
         });
 
         Game.ExecuteMove(bestMove);

@@ -24,6 +24,11 @@ static class Bot
         get { return color; }
     }
 
+    public static bool CanUseBook
+    {
+        get { return canUseBook; }
+    }
+
     public static Move Think()
     {
 

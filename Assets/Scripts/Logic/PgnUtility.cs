@@ -166,18 +166,6 @@ static class PgnUtility
     public static string MoveToAlgebraic(Move move)
     {
 
-        // Castling
-        if (move.MoveFlag == Move.Flag.Castling)
-        {
-            switch (Board.File(move.TargetSquare))
-            {
-                case 2:
-                    return "O-O-O";
-                case 6:
-                    return "O-O";
-            }
-        }
-
         // Check and checkmate
         Board.RecordMove(move);  // Pretend to make the move. * This is okay because GameState.RecordMove() essentially already happened *
         int enemyKingSquare = LegalMoves.FindFriendlyKingSquare();
@@ -185,6 +173,18 @@ static class PgnUtility
         bool hasMovesAfter = LegalMoves.GetLegalMoves().Count > 0;
         string checkSymbol = isInCheck ? (hasMovesAfter ? "+" : "#") : "";
         Board.UnRecordMove();   // Undo the pretend move
+
+        // Castling
+        if (move.MoveFlag == Move.Flag.Castling)
+        {
+            switch (Board.File(move.TargetSquare))
+            {
+                case 2:
+                    return "O-O-O" + checkSymbol;
+                case 6:
+                    return "O-O" + checkSymbol;
+            }
+        }
 
         // Target square
         string targetSquareAlgebraic = Helpers.SquareToAlgebraic(move.TargetSquare);

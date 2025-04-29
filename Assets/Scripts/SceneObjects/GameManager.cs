@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
     public AudioClip moveAudioClip;
     public AudioClip captureAudioClip;
     public AudioClip checkAudioClip;
+    public AudioClip castleAudioClip;
+    public AudioClip gameEndAudioClip;
 
     private void Start()
     {
@@ -63,6 +65,16 @@ public class GameManager : MonoBehaviour
     public void PlayCheckSound()
     {
         audioSource.clip = checkAudioClip;
+        audioSource.Play();
+    }
+    public void PlayCastleSound()
+    {
+        audioSource.clip = castleAudioClip;
+        audioSource.Play();
+    }
+    public void PlayGameEndSound()
+    {
+        audioSource.clip = gameEndAudioClip;
         audioSource.Play();
     }
 }

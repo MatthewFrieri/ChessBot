@@ -4,13 +4,12 @@ using UnityEngine;
 
 public class Clock : MonoBehaviour
 {
-    void Start()
-    {
-
-    }
 
     void Update()
     {
+
+        if (Game.IsGameOver) { return; }
+
         if (GameState.Pgn.Count % 2 == 0)
         {
             GameState.DecrementWhiteTime(Time.deltaTime);
