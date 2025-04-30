@@ -107,6 +107,11 @@ static class Game
             Debug.Log("GAME OVER!");
             isCheckmate = true;
         }
+        else if (Evaluate.IsDraw(LegalMoves.GetLegalMoves().Count))
+        {
+            Debug.Log("DRAW!");
+            isDraw = true;
+        }
         else
         {
             StartNextMove();

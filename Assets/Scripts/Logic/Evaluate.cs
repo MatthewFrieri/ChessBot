@@ -26,28 +26,8 @@ static class Evaluate
 
     public static int EvaluatePosition(int legalMovesCount)
     {
-        if (legalMovesCount == 0)
-        {
-            int friendlyKingSquare = LegalMoves.FindFriendlyKingSquare();
-
-            if (LegalMoves.IsSquareUnderAttack(friendlyKingSquare, Piece.OppositeColor(GameState.ColorToMove)))
-            {
-                return -checkmateEval;  // Checkmate
-            }
-            return 0;  // Draw by stalemate
-        }
-
-        if (GameState.HalfMoveClock >= 50)
-        {
-            return 0;  // Draw by 50 move rule
-        }
-
-        if (Board.Has3MoveRepetitioned())
-        {
-            return 0;  // Draw by 3 move repetition
-        }
-
-
+        if (IsCheckmate(legalMovesCount)) { return -checkmateEval; }
+        if (IsDraw(legalMovesCount)) { return 0; }
 
         int perspective = GameState.ColorToMove == Piece.White ? 1 : -1;
 
@@ -56,6 +36,47 @@ static class Evaluate
 
         return (whiteValue - blackValue) * perspective;
     }
+
+    public static bool IsCheckmate(int legalMovesCount)
+    {
+        if (legalMovesCount == 0)
+        {
+            int friendlyKingSquare = LegalMoves.FindFriendlyKingSquare();
+
+            if (LegalMoves.IsSquareUnderAttack(friendlyKingSquare, Piece.OppositeColor(GameState.ColorToMove)))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static bool IsDraw(int legalMovesCount)
+    {
+        if (legalMovesCount == 0)
+        {
+            int friendlyKingSquare = LegalMoves.FindFriendlyKingSquare();
+
+            if (!LegalMoves.IsSquareUnderAttack(friendlyKingSquare, Piece.OppositeColor(GameState.ColorToMove)))
+            {
+                return true;  // Draw by stalemate
+            }
+        }
+
+        if (GameState.HalfMoveClock >= 50)
+        {
+            return true;  // Draw by 50 move rule
+        }
+
+        if (Board.Has3MoveRepetitioned())
+        {
+            return true;  // Draw by 3 move repetition
+        }
+
+        return false;
+    }
+
 
     private static int GetMaterialValue(int color)
     {

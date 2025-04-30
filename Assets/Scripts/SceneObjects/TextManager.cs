@@ -29,9 +29,16 @@ public class TextManager : MonoBehaviour
         bestMove.text = "Best Move: " + Search.BestMoveAlgebraic;
         evaluation.text = "Evaluation: " + (float)(Bot.Color == Piece.White ? 1 : -1) * Search.BestEval / 100;
 
-        if (Game.IsCheckmate)
+        if (Game.IsGameOver)
         {
-            winner.text = $"CHECKMATE {(GameState.ColorToMove == Piece.White ? "Black" : "White")} Wins!";
+            if (Game.IsCheckmate)
+            {
+                winner.text = $"CHECKMATE {(GameState.ColorToMove == Piece.White ? "Black" : "White")} Wins!";
+            }
+            else
+            {
+                winner.text = "DRAW";
+            }
         }
         else
         {
